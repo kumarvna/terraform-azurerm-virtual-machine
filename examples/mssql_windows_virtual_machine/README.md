@@ -1,6 +1,6 @@
 # Azure MSSQL Windows virtual Machine creation
 
-This terraform module is designed to deploy azure Windows or Linux virtual machines with Public IP, Availability Set and Network Security Group support.
+This terraform module is designed to deploy azure MSSQL Windows virtual machines with Public IP, Availability Set and Network Security Group support.
 
 ## Module Usage
 
