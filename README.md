@@ -78,7 +78,9 @@ module "virtual-machine" {
 
 ## Default Local Administrator and the Password
 
-This module utilizes __`azureadmin`__ as a local administrator on virtual machines. If you want to you use custom username, then specify the same by setting up the argument `admin_username` with valid user string. If there is no password set by specifying the argument `admin_password` then, this module generates a strong random password.
+This module utilizes __`azureadmin`__ as a local administrator on virtual machines. If you want to you use custom username, then specify the same by setting up the argument `admin_username` with valid user string.
+
+By default, this module generates a strong password for all virtual machines. If you want to set the custom password, specify the argument `admin_password` with valid string.
 
 ## Pre-Defined Windows and Linux VM Images
 
