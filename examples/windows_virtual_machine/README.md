@@ -26,8 +26,8 @@ module "virtual-machine" {
   # Ubuntu images: mssql2019ent-ubuntu1804, mssql2019std-ubuntu1804, mssql2019dev-ubuntu1804
   # Bring your own License (BOYL) images: mssql2019ent-byol, mssql2019std-byol
   os_flavor                  = "windows"
-  linux_distribution_name    = "windows2019dc"
-  virtual_machine_size       = "Standard_A2_v2"  
+  windows_distribution_name  = "windows2019dc"
+  virtual_machine_size       = "Standard_A2_v2"
   admin_username             = "azureadmin"
   admin_password             = "complex_password"
   instances_count            = 2
@@ -36,11 +36,11 @@ module "virtual-machine" {
 
   # Network Seurity group port allow definitions for each Virtual Machine
   # NSG association to be added automatically for all network interfaces.
-  # SSH port 22 and 3389 is exposed to the Internet recommended for only testing.
+  # SSH port 22 and 3389 is exposed to the Internet recommended for only testing. 
   # For production environments, recommended to use a VPN or private connection.
   nsg_inbound_rules = [
     {
-      name                   = "ssh"
+      name                   = "rdp"
       destination_port_range = "3389"
       source_address_prefix  = "*"
     },

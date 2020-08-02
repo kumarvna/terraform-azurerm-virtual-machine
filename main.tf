@@ -133,7 +133,7 @@ resource "azurerm_network_interface_security_group_association" "nsgassoc" {
 #---------------------------------------
 resource "azurerm_linux_virtual_machine" "linux_vm" {
   count                      = var.os_flavor == "linux" ? var.instances_count : 0
-  name                       = format("vm-linux-%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1)
+  name                       = format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1)
   resource_group_name        = data.azurerm_resource_group.rg.name
   location                   = data.azurerm_resource_group.rg.location
   size                       = var.virtual_machine_size
@@ -173,8 +173,8 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
 #---------------------------------------
 resource "azurerm_windows_virtual_machine" "win_vm" {
   count                      = var.os_flavor == "windows" ? var.instances_count : 0
-  name                       = format("vm-win-%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1)
-  computer_name              = format("%s-vm", "windows") # not more than 15 characters
+  name                       = format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1)
+  computer_name              = format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1)
   resource_group_name        = data.azurerm_resource_group.rg.name
   location                   = data.azurerm_resource_group.rg.location
   size                       = var.virtual_machine_size
