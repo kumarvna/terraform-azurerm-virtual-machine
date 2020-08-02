@@ -46,6 +46,16 @@ resource "random_password" "passwd" {
   }
 }
 
+resource "random_string" "str" {
+  count   = var.enable_public_ip_address == true ? var.instances_count : 0
+  length  = 6
+  special = false
+  upper   = false
+  keepers = {
+    domain_name_label = var.virtual_machine_name
+  }
+}
+
 #-----------------------------------
 # Public IP for Virtual Machine
 #-----------------------------------
@@ -56,7 +66,7 @@ resource "azurerm_public_ip" "pip" {
   resource_group_name = data.azurerm_resource_group.rg.name
   allocation_method   = "Static"
   sku                 = "Standard"
-  domain_name_label   = format("vm-%s-pip-0${count.index + 1}", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")))
+  domain_name_label   = format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), random_string.str[count.index].result)
   tags                = merge({ "ResourceName" = lower("pip-vm-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}-0${count.index + 1}") }, var.tags, )
 }
 
@@ -78,7 +88,7 @@ resource "azurerm_network_interface" "nic" {
     primary                       = true
     subnet_id                     = data.azurerm_subnet.snet.id
     private_ip_address_allocation = var.private_ip_address_allocation_type
-    private_ip_address            = var.private_ip_address_allocation_type == "Static" ? var.private_ip_address : null
+    private_ip_address            = var.private_ip_address_allocation_type == "Static" ? element(concat(var.private_ip_address, [""]), count.index) : null
     public_ip_address_id          = var.enable_public_ip_address == true ? element(concat(azurerm_public_ip.pip.*.id, [""]), count.index) : null
   }
 }
