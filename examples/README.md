@@ -16,7 +16,7 @@ module "virtual-machine" {
   location             = "westeurope"
   virtual_network_name = "vnet-default-hub-westeurope"
   subnet_name          = "snet-management-default-hub-westeurope"
-  virtual_machine_name = "testvm"
+  virtual_machine_name = "vm-linux"
 
   # This module support multiple Pre-Defined Linux and Windows Distributions.
   # Linux images: ubuntu1804, ubuntu1604, centos75, centos77, centos81, coreos
@@ -77,7 +77,7 @@ module "virtual-machine" {
   location             = "westeurope"
   virtual_network_name = "vnet-default-hub-westeurope"
   subnet_name          = "snet-management-default-hub-westeurope"
-  virtual_machine_name = "testvm"
+  virtual_machine_name = "vm-windows"
 
   # This module support multiple Pre-Defined Linux and Windows Distributions.
   # Linux images: ubuntu1804, ubuntu1604, centos75, centos77, centos81, coreos
@@ -89,7 +89,7 @@ module "virtual-machine" {
   # Ubuntu images: mssql2019ent-ubuntu1804, mssql2019std-ubuntu1804, mssql2019dev-ubuntu1804
   # Bring your own License (BOYL) images: mssql2019ent-byol, mssql2019std-byol
   os_flavor                  = "windows"
-  linux_distribution_name    = "windows2019dc"
+  windows_distribution_name  = "windows2019dc"
   virtual_machine_size       = "Standard_A2_v2"  
   admin_username             = "azureadmin"
   admin_password             = "complex_password"
@@ -103,7 +103,7 @@ module "virtual-machine" {
   # For production environments, recommended to use a VPN or private connection.
   nsg_inbound_rules = [
     {
-      name                   = "ssh"
+      name                   = "rdp"
       destination_port_range = "3389"
       source_address_prefix  = "*"
     },
@@ -139,7 +139,7 @@ module "virtual-machine" {
   location             = "westeurope"
   virtual_network_name = "vnet-default-hub-westeurope"
   subnet_name          = "snet-management-default-hub-westeurope"
-  virtual_machine_name = "testvm"
+  virtual_machine_name = "vm-mssql"
 
   # This module support multiple Pre-Defined Linux and Windows Distributions.
   # Linux images: ubuntu1804, ubuntu1604, centos75, centos77, centos81, coreos
@@ -151,7 +151,7 @@ module "virtual-machine" {
   # Ubuntu images: mssql2019ent-ubuntu1804, mssql2019std-ubuntu1804, mssql2019dev-ubuntu1804
   # Bring your own License (BOYL) images: mssql2019ent-byol, mssql2019std-byol
   os_flavor                  = "windows"
-  linux_distribution_name    = "mssql2017std"
+  windows_distribution_name  = "mssql2017std"
   virtual_machine_size       = "Standard_A2_v2"  
   admin_username             = "azureadmin"
   admin_password             = "complex_password"
@@ -164,7 +164,7 @@ module "virtual-machine" {
   # For production environments, recommended to use a VPN or private connection.
   nsg_inbound_rules = [
     {
-      name                   = "ssh"
+      name                   = "rdp"
       destination_port_range = "3389"
       source_address_prefix  = "*"
     },
