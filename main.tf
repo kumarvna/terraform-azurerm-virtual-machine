@@ -34,7 +34,7 @@ data "azurerm_subnet" "snet" {
 }
 
 resource "random_password" "passwd" {
-  count       = var.disable_password_authentication != true || var.os_flavor == "windows" ? 1 : 0
+  count       = var.disable_password_authentication != true || var.os_flavor == "windows" && var.admin_password == null ? 1 : 0
   length      = 24
   min_upper   = 4
   min_lower   = 2
@@ -197,7 +197,7 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
   dedicated_host_id          = var.dedicated_host_id
   license_type               = var.license_type
   availability_set_id        = var.enable_vm_availability_set == true ? element(concat(azurerm_availability_set.aset.*.id, [""]), 0) : null
-  tags                       = merge({ "ResourceName" = format("vm-win-%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1) }, var.tags, )
+  tags                       = merge({ "ResourceName" = format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1) }, var.tags, )
 
   dynamic "source_image_reference" {
     for_each = var.source_image_id != null ? [] : [1]
