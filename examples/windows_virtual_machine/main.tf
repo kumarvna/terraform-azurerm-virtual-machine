@@ -1,7 +1,7 @@
 module "virtual-machine" {
-  // source  = "kumarvna/virtual-machine/azurerm"
-  //version = "1.0.0"
-  source = "../../"
+  source  = "kumarvna/virtual-machine/azurerm"
+  version = "1.0.0"
+
 
   # Resource Group, location, VNet and Subnet details
   resource_group_name  = "rg-hub-demo-internal-shared-westeurope-001"

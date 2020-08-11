@@ -37,12 +37,12 @@ output "linux_vm_private_ips" {
 
 output "linux_virtual_machine_ids" {
   description = "The resource id's of all Linux Virtual Machine."
-  value       = var.os_flavor == "linux" ? element(concat(azurerm_linux_virtual_machine.linux_vm.*.id, [""]), 0) : null
+  value       = var.os_flavor == "linux" ? concat(azurerm_linux_virtual_machine.linux_vm.*.id, [""]) : null
 }
 
 output "windows_virtual_machine_ids" {
   description = "The resource id's of all Windows Virtual Machine."
-  value       = var.os_flavor == "windows" ? element(concat(azurerm_windows_virtual_machine.win_vm.*.id, [""]), 0) : null
+  value       = var.os_flavor == "windows" ? concat(azurerm_windows_virtual_machine.win_vm.*.id, [""]) : null
 }
 
 output "network_security_group_ids" {
