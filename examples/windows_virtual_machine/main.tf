@@ -1,14 +1,17 @@
 module "virtual-machine" {
   source  = "kumarvna/virtual-machine/azurerm"
-  version = "1.0.0"
-
+  version = "2.0.0"
 
   # Resource Group, location, VNet and Subnet details
   resource_group_name  = "rg-hub-demo-internal-shared-westeurope-001"
   location             = "westeurope"
   virtual_network_name = "vnet-default-hub-westeurope"
   subnet_name          = "snet-management-default-hub-westeurope"
-  virtual_machine_name = "vm-winsrv"
+  virtual_machine_name = "vm-linux"
+
+  # (Optional) To enable Azure Monitoring and install log analytics agents
+  log_analytics_workspace_name = var.log_analytics_workspace_id
+  hub_storage_account_name     = var.hub_storage_account_id
 
   # This module support multiple Pre-Defined Linux and Windows Distributions.
   # Linux images: ubuntu1804, ubuntu1604, centos75, centos77, centos81, coreos

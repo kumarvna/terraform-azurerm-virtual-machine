@@ -18,6 +18,16 @@ variable "subnet_name" {
   default     = ""
 }
 
+variable "log_analytics_workspace_name" {
+  description = "The name of log analytics workspace name"
+  default     = null
+}
+
+variable "hub_storage_account_name" {
+  description = "The name of the hub storage account to store logs"
+  default     = null
+}
+
 variable "virtual_machine_name" {
   description = "The name of the virtual machine."
   default     = ""
@@ -341,6 +351,11 @@ variable "dedicated_host_id" {
 variable "license_type" {
   description = "Specifies the type of on-premise license which should be used for this Virtual Machine. Possible values are None, Windows_Client and Windows_Server."
   default     = "None"
+}
+
+variable "nsg_diag_logs" {
+  description = "NSG Monitoring Category details for Azure Diagnostic setting"
+  default     = ["NetworkSecurityGroupEvent", "NetworkSecurityGroupRuleCounter"]
 }
 
 variable "tags" {

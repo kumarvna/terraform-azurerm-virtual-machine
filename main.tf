@@ -33,6 +33,18 @@ data "azurerm_subnet" "snet" {
   resource_group_name  = data.azurerm_resource_group.rg.name
 }
 
+data "azurerm_log_analytics_workspace" "logws" {
+  count               = var.log_analytics_workspace_name != null ? 1 : 0
+  name                = var.log_analytics_workspace_name
+  resource_group_name = data.azurerm_resource_group.rg.name
+}
+
+data "azurerm_storage_account" "storeacc" {
+  count               = var.hub_storage_account_name != null ? 1 : 0
+  name                = var.hub_storage_account_name
+  resource_group_name = data.azurerm_resource_group.rg.name
+}
+
 resource "random_password" "passwd" {
   count       = var.disable_password_authentication != true || var.os_flavor == "windows" && var.admin_password == null ? 1 : 0
   length      = 24
@@ -212,6 +224,80 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
   os_disk {
     storage_account_type = var.os_disk_storage_account_type
     caching              = "ReadWrite"
+  }
+}
+
+#--------------------------------------------------------------
+# Azure Log Analytics Workspace Agent Installation for windows
+#--------------------------------------------------------------
+resource "azurerm_virtual_machine_extension" "omsagentwin" {
+  count                      = var.log_analytics_workspace_name != null && var.os_flavor == "windows" ? var.instances_count : 0
+  name                       = var.instances_count == 1 ? "OmsAgentForWindows" : format("%s%s", "OmsAgentForWindows", count.index + 1)
+  virtual_machine_id         = azurerm_windows_virtual_machine.win_vm[count.index].id
+  publisher                  = "Microsoft.EnterpriseCloud.Monitoring"
+  type                       = "MicrosoftMonitoringAgent"
+  type_handler_version       = "1.0"
+  auto_upgrade_minor_version = true
+
+  settings = <<SETTINGS
+    {
+      "workspaceId": "${data.azurerm_log_analytics_workspace.logws.0.workspace_id}"
+    }
+  SETTINGS
+
+  protected_settings = <<PROTECTED_SETTINGS
+    {
+    "workspaceKey": "${data.azurerm_log_analytics_workspace.logws.0.primary_shared_key}"
+    }
+  PROTECTED_SETTINGS
+}
+
+#--------------------------------------------------------------
+# Azure Log Analytics Workspace Agent Installation for Linux
+#--------------------------------------------------------------
+resource "azurerm_virtual_machine_extension" "omsagentlinux" {
+  count                      = var.log_analytics_workspace_name != null && var.os_flavor == "linux" ? var.instances_count : 0
+  name                       = var.instances_count == 1 ? "OmsAgentForLinux" : format("%s%s", "OmsAgentForLinux", count.index + 1)
+  virtual_machine_id         = azurerm_linux_virtual_machine.linux_vm[count.index].id
+  publisher                  = "Microsoft.EnterpriseCloud.Monitoring"
+  type                       = "OmsAgentForLinux"
+  type_handler_version       = "1.13"
+  auto_upgrade_minor_version = true
+
+  settings = <<SETTINGS
+    {
+      "workspaceId": "${data.azurerm_log_analytics_workspace.logws.0.workspace_id}"
+    }
+  SETTINGS
+
+  protected_settings = <<PROTECTED_SETTINGS
+    {
+    "workspaceKey": "${data.azurerm_log_analytics_workspace.logws.0.primary_shared_key}"
+    }
+  PROTECTED_SETTINGS
+}
+
+
+#--------------------------------------
+# azurerm monitoring diagnostics 
+#--------------------------------------
+resource "azurerm_monitor_diagnostic_setting" "nsg" {
+  count                      = var.log_analytics_workspace_name != null && var.hub_storage_account_name != null ? 1 : 0
+  name                       = lower("nsg-${var.virtual_machine_name}-diag")
+  target_resource_id         = azurerm_network_security_group.nsg.id
+  storage_account_id         = data.azurerm_storage_account.storeacc.0.id
+  log_analytics_workspace_id = data.azurerm_log_analytics_workspace.logws.0.id
+
+  dynamic "log" {
+    for_each = var.nsg_diag_logs
+    content {
+      category = log.value
+      enabled  = true
+
+      retention_policy {
+        enabled = false
+      }
+    }
   }
 }
 
