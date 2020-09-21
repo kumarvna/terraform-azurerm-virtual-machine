@@ -29,11 +29,11 @@ module "virtual-machine" {
   # RHEL8 images: mssql2019ent-rhel8, mssql2019std-rhel8, mssql2019dev-rhel8
   # Ubuntu images: mssql2019ent-ubuntu1804, mssql2019std-ubuntu1804, mssql2019dev-ubuntu1804
   # Bring your own License (BOYL) images: mssql2019ent-byol, mssql2019std-byol
-  os_flavor                 = "windows"
-  windows_distribution_name = "windows2019dc"
-  virtual_machine_size      = "Standard_A2_v2"
-  admin_username            = "azureadmin"
-  admin_password             = "complex_password"
+  os_flavor                  = "windows"
+  windows_distribution_name  = "windows2019dc"
+  virtual_machine_size       = "Standard_A2_v2"
+  admin_username             = "azureadmin"
+  admin_password             = "P@$$w0rd1234!"
   instances_count            = 2
   enable_vm_availability_set = true
   enable_public_ip_address   = true
