@@ -22,26 +22,27 @@ data "azurerm_resource_group" "rg" {
   name = var.resource_group_name
 }
 
-data "azurerm_virtual_network" "vnet" {
+/*data "azurerm_virtual_network" "vnet" {
   name                = var.virtual_network_name
-  resource_group_name = data.azurerm_resource_group.rg.name
-}
+  resource_group_name = var.virtual_network_resource_group_name
+}*/
 
 data "azurerm_subnet" "snet" {
   name                 = var.subnet_name
-  virtual_network_name = data.azurerm_virtual_network.vnet.name
-  resource_group_name  = data.azurerm_resource_group.rg.name
+  virtual_network_name = var.virtual_network_name
+  resource_group_name  = var.virtual_network_resource_group_name
 }
 
 data "azurerm_log_analytics_workspace" "logws" {
   count               = var.log_analytics_workspace_name != null ? 1 : 0
+  provider            = azurerm.shared
   name                = var.log_analytics_workspace_name
-  resource_group_name = data.azurerm_resource_group.rg.name
+  resource_group_name = var.log_analytics_workspace_rg
 }
 
 data "azurerm_storage_account" "storeacc" {
-  count               = var.hub_storage_account_name != null ? 1 : 0
-  name                = var.hub_storage_account_name
+  count               = var.vm_storage_account_name != null ? 1 : 0
+  name                = var.vm_storage_account_name
   resource_group_name = data.azurerm_resource_group.rg.name
 }
 
@@ -80,6 +81,10 @@ resource "azurerm_public_ip" "pip" {
   sku                 = "Standard"
   domain_name_label   = format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), random_string.str[count.index].result)
   tags                = merge({ "ResourceName" = lower("pip-vm-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}-0${count.index + 1}") }, var.tags, )
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 #---------------------------------------
@@ -94,6 +99,10 @@ resource "azurerm_network_interface" "nic" {
   enable_ip_forwarding          = var.enable_ip_forwarding
   enable_accelerated_networking = var.enable_accelerated_networking
   tags                          = merge({ "ResourceName" = var.instances_count == 1 ? lower("nic-${format("vm%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")))}") : lower("nic-${format("vm%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1)}") }, var.tags, )
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 
   ip_configuration {
     name                          = lower("ipconig-${format("vm%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1)}")
@@ -114,6 +123,10 @@ resource "azurerm_availability_set" "aset" {
   platform_update_domain_count = 2
   managed                      = true
   tags                         = merge({ "ResourceName" = lower("avail-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}") }, var.tags, )
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 #---------------------------------------------------------------
@@ -124,6 +137,10 @@ resource "azurerm_network_security_group" "nsg" {
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
   tags                = merge({ "ResourceName" = lower("nsg_${var.virtual_machine_name}_${data.azurerm_resource_group.rg.location}_in") }, var.tags, )
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 resource "azurerm_network_security_rule" "nsg_rule" {
@@ -169,9 +186,13 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
   availability_set_id        = var.enable_vm_availability_set == true ? element(concat(azurerm_availability_set.aset.*.id, [""]), 0) : null
   tags                       = merge({ "ResourceName" = var.instances_count == 1 ? var.virtual_machine_name : format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1) }, var.tags, )
 
+  lifecycle {
+    ignore_changes = [tags]
+  }
+
   admin_ssh_key {
     username   = var.admin_username
-    public_key = var.generate_admin_ssh_key == true && var.os_flavor == "linux" ? tls_private_key.rsa[0].public_key_openssh : file(var.admin_ssh_key_data)
+    public_key = var.generate_admin_ssh_key == true && var.os_flavor == "linux" ? tls_private_key.rsa[0].public_key_openssh : var.admin_ssh_key
   }
 
   dynamic "source_image_reference" {
@@ -210,6 +231,10 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
   license_type               = var.license_type
   availability_set_id        = var.enable_vm_availability_set == true ? element(concat(azurerm_availability_set.aset.*.id, [""]), 0) : null
   tags                       = merge({ "ResourceName" = var.instances_count == 1 ? var.virtual_machine_name : format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1) }, var.tags, )
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 
   dynamic "source_image_reference" {
     for_each = var.source_image_id != null ? [] : [1]
@@ -282,7 +307,7 @@ resource "azurerm_virtual_machine_extension" "omsagentlinux" {
 # azurerm monitoring diagnostics 
 #--------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "nsg" {
-  count                      = var.log_analytics_workspace_name != null && var.hub_storage_account_name != null ? 1 : 0
+  count                      = var.log_analytics_workspace_name != null && var.vm_storage_account_name != null ? 1 : 0
   name                       = lower("nsg-${var.virtual_machine_name}-diag")
   target_resource_id         = azurerm_network_security_group.nsg.id
   storage_account_id         = data.azurerm_storage_account.storeacc.0.id

@@ -13,6 +13,11 @@ variable "virtual_network_name" {
   default     = ""
 }
 
+variable "virtual_network_resource_group_name" {
+  description = "The name of the virtual network resource group "
+  default = ""
+}
+
 variable "subnet_name" {
   description = "The name of the subnet to use in VM scale set"
   default     = ""
@@ -23,8 +28,13 @@ variable "log_analytics_workspace_name" {
   default     = null
 }
 
-variable "hub_storage_account_name" {
-  description = "The name of the hub storage account to store logs"
+variable "log_analytics_workspace_rg" {
+  description = "The name of the log analytics workspace resource group"
+  default     = null
+}
+
+variable "vm_storage_account_name" {
+  description = "The name of the vm storage account to store logs"
   default     = null
 }
 
@@ -40,7 +50,7 @@ variable "os_flavor" {
 
 variable "virtual_machine_size" {
   description = "The Virtual Machine SKU for the Virtual Machine, Default is Standard_A2_V2"
-  default     = "Standard_A2_v2"
+  default     = "Standard_B2s"
 }
 
 variable "instances_count" {
@@ -231,6 +241,13 @@ variable "windows_distribution_list" {
       version   = "latest"
     },
 
+    windows2019dcgen2 = {
+      publisher = "MicrosoftWindowsServer"
+      offer     = "WindowsServer"
+      sku       = "2019-Datacenter-gensecond"
+      version   = "latest"
+    },
+
     windows2016dccore = {
       publisher = "MicrosoftWindowsServer"
       offer     = "WindowsServer"
@@ -304,7 +321,7 @@ variable "windows_distribution_list" {
 }
 
 variable "windows_distribution_name" {
-  default     = "windows2019dc"
+  default     = "windows2019dcgen2"
   description = "Variable to pick an OS flavour for Windows based VM. Possible values include: winserver, wincore, winsql"
 }
 
@@ -315,12 +332,11 @@ variable "os_disk_storage_account_type" {
 
 variable "generate_admin_ssh_key" {
   description = "Generates a secure private key and encodes it as PEM."
-  default     = true
+  default     = false
 }
 
-variable "admin_ssh_key_data" {
-  description = "specify the path to the existing SSH key to authenticate Linux virtual machine"
-  default     = ""
+variable "admin_ssh_key" {
+  description = "SSH key to authenticate Linux virtual machine"
 }
 
 variable "disable_password_authentication" {
@@ -330,7 +346,7 @@ variable "disable_password_authentication" {
 
 variable "admin_username" {
   description = "The username of the local administrator used for the Virtual Machine."
-  default     = "azureadmin"
+  default     = "Administrator"
 }
 
 variable "admin_password" {
