@@ -19,18 +19,22 @@ These types of resources supported:
 ```hcl
 module "virtual-machine" {
   source  = "kumarvna/virtual-machine/azurerm"
-  version = "2.0.0"
+  version = "2.1.0"
 
   # Resource Group, location, VNet and Subnet details
-  resource_group_name  = "rg-hub-demo-internal-shared-westeurope-001"
+  resource_group_name  = "rg-shared-westeurope-01"
   location             = "westeurope"
-  virtual_network_name = "vnet-default-hub-westeurope"
-  subnet_name          = "snet-management-default-hub-westeurope"
+  virtual_network_name = "vnet-shared-hub-westeurope-001"
+  subnet_name          = "snet-management"
   virtual_machine_name = "vm-linux"
 
   # (Optional) To enable Azure Monitoring and install log analytics agents
-  log_analytics_workspace_name = var.log_analytics_workspace_id
-  hub_storage_account_name     = var.hub_storage_account_id
+  log_analytics_workspace_name = var.log_analytics_workspace_name
+  hub_storage_account_name     = var.hub_storage_account_name
+
+  # Deploy log analytics agents to virtual machine. Log analytics workspace name required.
+  # Defaults to `false` 
+  deploy_log_analytics_agent = false
 
   # This module support multiple Pre-Defined Linux and Windows Distributions.
   # Linux images: ubuntu1804, ubuntu1604, centos75, centos77, centos81, coreos
@@ -49,9 +53,12 @@ module "virtual-machine" {
   instances_count            = 2
   enable_vm_availability_set = true
 
+  # Add public IP to your VM
+  enable_public_ip_address = true
+
   # Network Seurity group port allow definitions for each Virtual Machine
   # NSG association to be added automatically for all network interfaces.
-  # SSH port 22 and 3389 is exposed to the Internet recommended for only testing.
+  # SSH port 22 and 3389 is exposed to the Internet recommended for only testing. 
   # For production environments, recommended to use a VPN or private connection.
   nsg_inbound_rules = [
     {
@@ -68,7 +75,7 @@ module "virtual-machine" {
   ]
 
   # Adding TAG's to your Azure resources (Required)
-  # ProjectName and Env are already declared above, to use them here, create a varible.
+  # ProjectName and Env are already declared above, to use them here, create a varible. 
   tags = {
     ProjectName  = "demo-internal"
     Env          = "dev"
@@ -81,9 +88,9 @@ module "virtual-machine" {
 
 ## Default Local Administrator and the Password
 
-This module utilizes __`azureadmin`__ as a local administrator on virtual machines. If you want to you use custom username, then specify the same by setting up the argument `admin_username` with valid user string.
+This module utilizes __`azureadmin`__ as a local administrator on virtual machines. If you want to you use custom username, then specify the same by setting up the argument `admin_username` with a valid user string.
 
-By default, this module generates a strong password for all virtual machines. If you want to set the custom password, specify the argument `admin_password` with valid string.
+By default, this module generates a strong password for all virtual machines also allows you to change the length of random password using the `random_password_length` variable. If you want to set the custom password, specify the argument `admin_password` with a valid string.
 
 This module also generates SSH2 Key pair for Linux servers by default, however, it is only recommended to use for dev environment. For production environments, please generate your own SSH2 key with a passphrase and input the key by providing the path to the argument `admin_ssh_key_data`.
 
@@ -108,7 +115,7 @@ If the pre-defined Windows or Linux variants are not sufficient then, you can sp
 ```hcl
 module "virtual-machine" {
   source  = "kumarvna/virtual-machine/azurerm"
-  version = "2.0.0"
+  version = "2.1.0"
 
   # .... omitted
 
@@ -200,7 +207,7 @@ In the Source and Destination columns, `VirtualNetwork`, `AzureLoadBalancer`, an
 ```hcl
 module "virtual-machine" {
   source  = "kumarvna/virtual-machine/azurerm"
-  version = "2.0.0"
+  version = "2.1.0"
 
   # .... omitted
   
@@ -260,7 +267,7 @@ End Date of the Project|Date when this application, workload, or service is plan
 ```hcl
 module "virtual-machine" {
   source  = "kumarvna/virtual-machine/azurerm"
-  version = "2.0.0"
+  version = "2.1.0"
 
   # Resource Group, location, VNet and Subnet details
   resource_group_name  = "rg-hub-demo-internal-shared-westeurope-001"
@@ -307,6 +314,7 @@ Name | Description | Type | Default
 `windows_distribution_list`|Pre-defined Azure Windows VM images list|map(object)|`"windows2019dc"`
 `windows_distribution_name`|Variable to pick an OS flavor for Windows based VM. Possible values are `windows2012r2dc`, `windows2016dc`, `windows2019dc`, `windows2016dccore`, `mssql2017exp`, `mssql2017dev`, `mssql2017std`, `mssql2017ent`, `mssql2019dev`, `mssql2019std`, `mssql2019ent`, `mssql2019ent-byol`, `mssql2019std-byol`|string|`"windows2019dc"`
 `os_disk_storage_account_type`|The Type of Storage Account for Internal OS Disk. Possible values include Standard_LRS, StandardSSD_LRS and Premium_LRS.|string|`"StandardSSD_LRS"`
+`enable_ultra_ssd_data_disk_storage_support`|Should the capacity to enable Data Disks of the UltraSSD_LRS storage account type be supported on this Virtual Machine|string|`false`
 `generate_admin_ssh_key`|Generates a secure private key and encodes it as PEM|string|`true`
 `admin_ssh_key_data`|specify the path to the existing SSH key to authenticate Linux virtual machine|string|`""`
 `admin_username`|The username of the local administrator used for the Virtual Machine|string|`"azureadmin"`
@@ -316,6 +324,7 @@ Name | Description | Type | Default
 `nsg_inbound_rules`|List of network rules to apply to network interface|object|`{}`
 `dedicated_host_id`|The ID of a Dedicated Host where this machine should be run on|string|`null`
 `license_type`|Specifies the type of on-premise license which should be used for this Virtual Machine. Possible values are `None`, `Windows_Client` and `Windows_Server`.|string|`"None"`
+`vm_time_zone`|Specifies the Time Zone which should be used by the Virtual Machine. Ex. `"UTC"` or `"W. Europe Standard Time"` [The possible values are defined here](https://jackstromberg.com/2017/01/list-of-time-zones-consumed-by-azure/) |string|`null`
 `Tags`|A map of tags to add to all resources|map|`{}`
 
 ## Outputs

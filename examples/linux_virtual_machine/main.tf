@@ -1,7 +1,6 @@
 module "virtual-machine" {
-  //source  = "kumarvna/virtual-machine/azurerm"
-  //version = "2.0.0"
-  source = "../../"
+  source  = "kumarvna/virtual-machine/azurerm"
+  version = "2.1.0"
 
   # Resource Group, location, VNet and Subnet details
   resource_group_name  = "rg-shared-westeurope-01"
@@ -13,6 +12,10 @@ module "virtual-machine" {
   # (Optional) To enable Azure Monitoring and install log analytics agents
   log_analytics_workspace_name = var.log_analytics_workspace_name
   hub_storage_account_name     = var.hub_storage_account_name
+
+  # Deploy log analytics agents to virtual machine. Log analytics workspace name required.
+  # Defaults to `false` 
+  deploy_log_analytics_agent = false
 
   # This module support multiple Pre-Defined Linux and Windows Distributions.
   # Linux images: ubuntu1804, ubuntu1604, centos75, centos77, centos81, coreos
@@ -30,6 +33,9 @@ module "virtual-machine" {
   admin_ssh_key_data         = "~/.ssh/id_rsa.pub"
   instances_count            = 2
   enable_vm_availability_set = true
+
+  # Add public IP to your VM
+  enable_public_ip_address = true
 
   # Network Seurity group port allow definitions for each Virtual Machine
   # NSG association to be added automatically for all network interfaces.

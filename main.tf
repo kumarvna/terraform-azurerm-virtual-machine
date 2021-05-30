@@ -167,6 +167,7 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
   allow_extension_operations = true
   dedicated_host_id          = var.dedicated_host_id
   availability_set_id        = var.enable_vm_availability_set == true ? element(concat(azurerm_availability_set.aset.*.id, [""]), 0) : null
+  encryption_at_host_enabled = var.enable_encryption_at_host
   tags                       = merge({ "ResourceName" = var.instances_count == 1 ? var.virtual_machine_name : format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1) }, var.tags, )
 
   admin_ssh_key {
@@ -187,6 +188,10 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
   os_disk {
     storage_account_type = var.os_disk_storage_account_type
     caching              = "ReadWrite"
+  }
+
+  additional_capabilities {
+    ultra_ssd_enabled = var.enable_ultra_ssd_data_disk_storage_support
   }
 }
 
@@ -209,6 +214,7 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
   dedicated_host_id          = var.dedicated_host_id
   license_type               = var.license_type
   availability_set_id        = var.enable_vm_availability_set == true ? element(concat(azurerm_availability_set.aset.*.id, [""]), 0) : null
+  timezone                   = var.vm_time_zone
   tags                       = merge({ "ResourceName" = var.instances_count == 1 ? var.virtual_machine_name : format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1) }, var.tags, )
 
   dynamic "source_image_reference" {
@@ -225,13 +231,17 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
     storage_account_type = var.os_disk_storage_account_type
     caching              = "ReadWrite"
   }
+
+  additional_capabilities {
+    ultra_ssd_enabled = var.enable_ultra_ssd_data_disk_storage_support
+  }
 }
 
 #--------------------------------------------------------------
 # Azure Log Analytics Workspace Agent Installation for windows
 #--------------------------------------------------------------
 resource "azurerm_virtual_machine_extension" "omsagentwin" {
-  count                      = var.log_analytics_workspace_name != null && var.os_flavor == "windows" ? var.instances_count : 0
+  count                      = var.deploy_log_analytics_agent && var.log_analytics_workspace_name != null && var.os_flavor == "windows" ? var.instances_count : 0
   name                       = var.instances_count == 1 ? "OmsAgentForWindows" : format("%s%s", "OmsAgentForWindows", count.index + 1)
   virtual_machine_id         = azurerm_windows_virtual_machine.win_vm[count.index].id
   publisher                  = "Microsoft.EnterpriseCloud.Monitoring"
@@ -256,7 +266,7 @@ resource "azurerm_virtual_machine_extension" "omsagentwin" {
 # Azure Log Analytics Workspace Agent Installation for Linux
 #--------------------------------------------------------------
 resource "azurerm_virtual_machine_extension" "omsagentlinux" {
-  count                      = var.log_analytics_workspace_name != null && var.os_flavor == "linux" ? var.instances_count : 0
+  count                      = var.deploy_log_analytics_agent && var.log_analytics_workspace_name != null && var.os_flavor == "linux" ? var.instances_count : 0
   name                       = var.instances_count == 1 ? "OmsAgentForLinux" : format("%s%s", "OmsAgentForLinux", count.index + 1)
   virtual_machine_id         = azurerm_linux_virtual_machine.linux_vm[count.index].id
   publisher                  = "Microsoft.EnterpriseCloud.Monitoring"

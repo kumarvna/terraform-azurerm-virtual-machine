@@ -337,6 +337,10 @@ variable "os_disk_storage_account_type" {
   default     = "StandardSSD_LRS"
 }
 
+variable "enable_ultra_ssd_data_disk_storage_support" {
+  description = "Should the capacity to enable Data Disks of the UltraSSD_LRS storage account type be supported on this Virtual Machine"
+  default     = false
+}
 variable "generate_admin_ssh_key" {
   description = "Generates a secure private key and encodes it as PEM."
   default     = true
@@ -376,10 +380,24 @@ variable "license_type" {
   description = "Specifies the type of on-premise license which should be used for this Virtual Machine. Possible values are None, Windows_Client and Windows_Server."
   default     = "None"
 }
+variable "enable_encryption_at_host" {
+  description = " Should all of the disks (including the temp disk) attached to this Virtual Machine be encrypted by enabling Encryption at Host?"
+  default     = false
+}
+
+variable "vm_time_zone" {
+  description = "Specifies the Time Zone which should be used by the Virtual Machine"
+  default     = null
+}
 
 variable "nsg_diag_logs" {
   description = "NSG Monitoring Category details for Azure Diagnostic setting"
   default     = ["NetworkSecurityGroupEvent", "NetworkSecurityGroupRuleCounter"]
+}
+
+variable "deploy_log_analytics_agent" {
+  description = "Install log analytics agent to windows or linux VM"
+  default     = false
 }
 
 variable "tags" {

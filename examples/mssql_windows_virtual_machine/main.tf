@@ -1,17 +1,22 @@
 module "virtual-machine" {
   source  = "kumarvna/virtual-machine/azurerm"
-  version = "2.0.0"
+  version = "2.1.0"
+
 
   # Resource Group, location, VNet and Subnet details
-  resource_group_name  = "rg-hub-demo-internal-shared-westeurope-001"
+  resource_group_name  = "rg-shared-westeurope-01"
   location             = "westeurope"
-  virtual_network_name = "vnet-default-hub-westeurope"
-  subnet_name          = "snet-management-default-hub-westeurope"
-  virtual_machine_name = "vm-linux"
+  virtual_network_name = "vnet-shared-hub-westeurope-001"
+  subnet_name          = "snet-management"
+  virtual_machine_name = "win-sqlvm"
 
   # (Optional) To enable Azure Monitoring and install log analytics agents
-  log_analytics_workspace_name = var.log_analytics_workspace_id
-  hub_storage_account_name     = var.hub_storage_account_id
+  log_analytics_workspace_name = var.log_analytics_workspace_name
+  hub_storage_account_name     = var.hub_storage_account_name
+
+  # Deploy log analytics agents to virtual machine. Log analytics workspace name required.
+  # Defaults to `false` 
+  deploy_log_analytics_agent = false
 
   # This module support multiple Pre-Defined Linux and Windows Distributions.
   # Linux images: ubuntu1804, ubuntu1604, centos75, centos77, centos81, coreos
@@ -23,12 +28,15 @@ module "virtual-machine" {
   # Ubuntu images: mssql2019ent-ubuntu1804, mssql2019std-ubuntu1804, mssql2019dev-ubuntu1804
   # Bring your own License (BOYL) images: mssql2019ent-byol, mssql2019std-byol
   os_flavor                  = "windows"
-  windows_distribution_name  = "mssql2017std"
+  windows_distribution_name  = "mssql2019std"
   virtual_machine_size       = "Standard_A2_v2"
   admin_username             = "azureadmin"
   admin_password             = "P@$$w0rd1234!"
   instances_count            = 2
   enable_vm_availability_set = true
+
+  # Add public IP to your VM
+  enable_public_ip_address = true
 
   # Network Seurity group port allow definitions for each Virtual Machine
   # NSG association to be added automatically for all network interfaces.
