@@ -111,7 +111,7 @@ module "virtual-machine" {
   windows_distribution_name = "windows2019dc"
   virtual_machine_size      = "Standard_A2_v2"
   admin_username            = "azureadmin"
-  #admin_password             = "P@$$w0rd1234!"
+  admin_password             = "P@$$w0rd1234!"
   instances_count            = 2
   enable_vm_availability_set = true
 
