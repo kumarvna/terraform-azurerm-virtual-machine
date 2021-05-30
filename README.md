@@ -295,7 +295,11 @@ Name | Description | Type | Default
 `private_ip_address`|The Static IP Address which should be used. This is valid only when `private_ip_address_allocation` is set to `Static`.|string|`null`
 `dns_servers`|List of dns servers to use for network interface|string|`[]`
 `enable_vm_availability_set`|Manages an Availability Set for Virtual Machines.|string|`false`
+`platform_fault_domain_count`|Specifies the number of fault domains that are used|number|`3`
+`platform_update_domain_count`|Specifies the number of update domains that are used|number|`5`
 `enable_public_ip_address`|Reference to a Public IP Address to associate with the NIC|string|`false`
+`public_ip_allocation_method`|Defines the allocation method for this IP address. Possible values are `Static` or `Dynamic`|string|`Static`
+`public_ip_sku`|The SKU of the Public IP. Accepted values are `Basic` and `Standard`|string|`Standard`
 `source_image_id`|The ID of an Image which each Virtual Machine should be based on|string|`null`
 `custom_image`|Provide the custom image to this module if the default variants are not sufficient|map(object)|`null`
 `linux_distribution_list`|Pre-defined Azure Linux VM images list|map(object)|`ubuntu1804`
@@ -307,6 +311,7 @@ Name | Description | Type | Default
 `admin_ssh_key_data`|specify the path to the existing SSH key to authenticate Linux virtual machine|string|`""`
 `admin_username`|The username of the local administrator used for the Virtual Machine|string|`"azureadmin"`
 `admin_password`|The Password which should be used for the local-administrator on this Virtual Machine|string|`null`
+`random_password_length`|The desired length of random password created by this module|number|`24`
 `disable_password_authentication`|Should Password Authentication be disabled on this Virtual Machine. Applicable to Linux Virtual machine|string|`true`
 `nsg_inbound_rules`|List of network rules to apply to network interface|object|`{}`
 `dedicated_host_id`|The ID of a Dedicated Host where this machine should be run on|string|`null`

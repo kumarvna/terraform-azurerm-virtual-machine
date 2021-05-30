@@ -28,6 +28,11 @@ variable "hub_storage_account_name" {
   default     = null
 }
 
+variable "random_password_length" {
+  description = "The desired length of random password created by this module"
+  default     = 24
+}
+
 variable "virtual_machine_name" {
   description = "The name of the virtual machine."
   default     = ""
@@ -78,9 +83,28 @@ variable "enable_vm_availability_set" {
   default     = false
 }
 
+variable "platform_fault_domain_count" {
+  description = "Specifies the number of fault domains that are used"
+  default     = 3
+}
+variable "platform_update_domain_count" {
+  description = "Specifies the number of update domains that are used"
+  default     = 5
+}
+
 variable "enable_public_ip_address" {
   description = "Reference to a Public IP Address to associate with the NIC"
   default     = null
+}
+
+variable "public_ip_allocation_method" {
+  description = "Defines the allocation method for this IP address. Possible values are `Static` or `Dynamic`"
+  default     = "Static"
+}
+
+variable "public_ip_sku" {
+  description = "The SKU of the Public IP. Accepted values are `Basic` and `Standard`"
+  default     = "Standard"
 }
 
 variable "source_image_id" {
