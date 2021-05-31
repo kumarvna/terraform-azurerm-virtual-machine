@@ -187,7 +187,7 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
 
   admin_ssh_key {
     username   = var.admin_username
-    public_key = var.generate_admin_ssh_key == true && var.os_flavor == "linux" ? tls_private_key.rsa[0].public_key_openssh : var.admin_ssh_key
+    public_key = var.generate_admin_ssh_key == true && var.os_flavor == "linux" ? tls_private_key.rsa[0].public_key_openssh : file(var.admin_ssh_key_data)
   }
 
   dynamic "source_image_reference" {
@@ -270,6 +270,10 @@ resource "azurerm_virtual_machine_extension" "omsagentwin" {
     "workspaceKey": "${data.azurerm_log_analytics_workspace.logws.0.primary_shared_key}"
     }
   PROTECTED_SETTINGS
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 #--------------------------------------------------------------
@@ -295,6 +299,10 @@ resource "azurerm_virtual_machine_extension" "omsagentlinux" {
     "workspaceKey": "${data.azurerm_log_analytics_workspace.logws.0.primary_shared_key}"
     }
   PROTECTED_SETTINGS
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 

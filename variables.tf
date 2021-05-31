@@ -335,8 +335,13 @@ variable "generate_admin_ssh_key" {
   default     = false
 }
 
-variable "admin_ssh_key" {
+/*variable "admin_ssh_key" {
   description = "SSH key to authenticate Linux virtual machine"
+}*/
+
+variable "admin_ssh_key_data" {
+  description = "specify the path to the existing SSH key to authenticate Linux virtual machine"
+  default = ""
 }
 
 variable "disable_password_authentication" {
@@ -346,7 +351,7 @@ variable "disable_password_authentication" {
 
 variable "admin_username" {
   description = "The username of the local administrator used for the Virtual Machine."
-  default     = "Administrator"
+  default     = "azureadmin"
 }
 
 variable "admin_password" {
