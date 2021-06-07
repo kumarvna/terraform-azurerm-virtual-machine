@@ -309,14 +309,14 @@ resource "azurerm_virtual_machine_extension" "omsagentlinux" {
 # Domain Join for Windows Virtual Machine
 #---------------------------------------
 resource "azurerm_virtual_machine_extension" "domjoin" {
-  count              = var.ad_domain_name != null && var.os_flavor == "windows" ? var.instances_count : 0
-  name               = var.instances_count == 1 ? "DomainJoin" : format("%s%s", "DomainJoin", count.index + 1)
-  virtual_machine_id = azurerm_windows_virtual_machine.win_vm[count.index].id
-  publisher          = "Microsoft.Compute"
-  type               = "JsonADDomainExtension"
+  count                = var.ad_domain_name != null && var.os_flavor == "windows" ? var.instances_count : 0
+  name                 = var.instances_count == 1 ? "DomainJoin" : format("%s%s", "DomainJoin", count.index + 1)
+  virtual_machine_id   = azurerm_windows_virtual_machine.win_vm[count.index].id
+  publisher            = "Microsoft.Compute"
+  type                 = "JsonADDomainExtension"
   type_handler_version = "1.3.2"
 
-  settings = <<SETTINGS
+  settings           = <<SETTINGS
   {
   "Name": "${var.ad_domain_name}",
   "OUPath": "${var.oupath}",
@@ -330,7 +330,7 @@ resource "azurerm_virtual_machine_extension" "domjoin" {
   "Password": "${var.ad_user_password}"
   }
   PROTECTED_SETTINGS
-  depends_on = [azurerm_windows_virtual_machine.win_vm]
+  depends_on         = [azurerm_windows_virtual_machine.win_vm]
 }
 
 

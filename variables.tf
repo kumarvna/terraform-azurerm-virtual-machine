@@ -15,7 +15,7 @@ variable "virtual_network_name" {
 
 variable "virtual_network_resource_group_name" {
   description = "The name of the virtual network resource group "
-  default = ""
+  default     = ""
 }
 
 variable "subnet_name" {
@@ -341,7 +341,7 @@ variable "generate_admin_ssh_key" {
 
 variable "admin_ssh_key_data" {
   description = "specify the path to the existing SSH key to authenticate Linux virtual machine"
-  default = ""
+  default     = ""
 }
 
 variable "disable_password_authentication" {
@@ -351,7 +351,7 @@ variable "disable_password_authentication" {
 
 variable "ad_domain_name" {
   description = "The domain name the VM is joined to"
-  default = null
+  default     = null
 }
 
 variable "admin_username" {
@@ -361,7 +361,7 @@ variable "admin_username" {
 
 variable "ad_user_name" {
   description = "The username of the AD account that can join computers to the domain"
-  default = null
+  default     = null
 }
 
 variable "admin_password" {
@@ -371,12 +371,12 @@ variable "admin_password" {
 
 variable "ad_user_password" {
   description = "The password of the AD account that can join computers to the domain"
-  default = null
+  default     = null
 }
 
 variable "oupath" {
   description = "The username of the AD account that can join computers to the domain"
-  default = null
+  default     = null
 }
 
 variable "nsg_inbound_rules" {
