@@ -335,13 +335,9 @@ variable "generate_admin_ssh_key" {
   default     = false
 }
 
-/*variable "admin_ssh_key" {
+variable "admin_ssh_key" {
   description = "SSH key to authenticate Linux virtual machine"
-}*/
-
-variable "admin_ssh_key_data" {
-  description = "specify the path to the existing SSH key to authenticate Linux virtual machine"
-  default     = ""
+  default     = null
 }
 
 variable "disable_password_authentication" {
