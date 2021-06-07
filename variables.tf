@@ -399,6 +399,11 @@ variable "nsg_diag_logs" {
   default     = ["NetworkSecurityGroupEvent", "NetworkSecurityGroupRuleCounter"]
 }
 
+variable "vm_time_zone" {
+  description = "Specifies the Time Zone which should be used by the Virtual Machine"
+  default     = "W. Europe Standard Time"
+}
+
 variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)

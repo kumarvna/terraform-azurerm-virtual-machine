@@ -179,6 +179,7 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
   allow_extension_operations = true
   dedicated_host_id          = var.dedicated_host_id
   availability_set_id        = var.enable_vm_availability_set == true ? element(concat(azurerm_availability_set.aset.*.id, [""]), 0) : null
+  timezone                   = var.vm_time_zone
   tags                       = merge({ "ResourceName" = var.instances_count == 1 ? var.virtual_machine_name : format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1) }, var.tags, )
 
   lifecycle {
@@ -225,6 +226,7 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
   dedicated_host_id          = var.dedicated_host_id
   license_type               = var.license_type
   availability_set_id        = var.enable_vm_availability_set == true ? element(concat(azurerm_availability_set.aset.*.id, [""]), 0) : null
+  timezone                   = var.vm_time_zone
   tags                       = merge({ "ResourceName" = var.instances_count == 1 ? var.virtual_machine_name : format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1) }, var.tags, )
 
   lifecycle {
