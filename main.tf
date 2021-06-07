@@ -315,7 +315,7 @@ resource "azurerm_virtual_machine_extension" "domjoin" {
   virtual_machine_id   = azurerm_windows_virtual_machine.win_vm[count.index].id
   publisher            = "Microsoft.Compute"
   type                 = "JsonADDomainExtension"
-  type_handler_version = "1.3.2"
+  type_handler_version = "1.3"
 
   settings           = <<SETTINGS
   {
