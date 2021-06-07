@@ -305,6 +305,34 @@ resource "azurerm_virtual_machine_extension" "omsagentlinux" {
   }
 }
 
+#---------------------------------------
+# Domain Join for Windows Virtual Machine
+#---------------------------------------
+resource "azurerm_virtual_machine_extension" "domjoin" {
+  count              = var.ad_domain_name != null && var.os_flavor == "windows" ? var.instances_count : 0
+  name               = var.instances_count == 1 ? "DomainJoin" : format("%s%s", "DomainJoin", count.index + 1)
+  virtual_machine_id = azurerm_windows_virtual_machine.win_vm[count.index].id
+  publisher          = "Microsoft.Compute"
+  type               = "JsonADDomainExtension"
+  type_handler_version = "1.3.2"
+
+  settings = <<SETTINGS
+  {
+  "Name": "${var.ad_domain_name}",
+  "OUPath": "${var.oupath}",
+  "Restart": "true",
+  "Options": "3",
+  "User": "${var.ad_user_name}"
+  }
+  SETTINGS
+  protected_settings = <<PROTECTED_SETTINGS
+  {
+  "Password": "${var.ad_user_password}"
+  }
+  PROTECTED_SETTINGS
+  depends_on = [azurerm_windows_virtual_machine.win_vm]
+}
+
 
 #--------------------------------------
 # azurerm monitoring diagnostics 
@@ -328,4 +356,3 @@ resource "azurerm_monitor_diagnostic_setting" "nsg" {
     }
   }
 }
-

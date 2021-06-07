@@ -349,14 +349,34 @@ variable "disable_password_authentication" {
   default     = true
 }
 
+variable "ad_domain_name" {
+  description = "The domain name the VM is joined to"
+  default = null
+}
+
 variable "admin_username" {
   description = "The username of the local administrator used for the Virtual Machine."
   default     = "azureadmin"
 }
 
+variable "ad_user_name" {
+  description = "The username of the AD account that can join computers to the domain"
+  default = null
+}
+
 variable "admin_password" {
   description = "The Password which should be used for the local-administrator on this Virtual Machine"
   default     = null
+}
+
+variable "ad_user_password" {
+  description = "The password of the AD account that can join computers to the domain"
+  default = null
+}
+
+variable "oupath" {
+  description = "The username of the AD account that can join computers to the domain"
+  default = null
 }
 
 variable "nsg_inbound_rules" {
