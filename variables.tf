@@ -405,3 +405,23 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "dsc_endpoint" {
+  description = "URL of automation account desc endpoint"
+}
+
+variable "dsc_mode" {
+  description = "DSC configuration mode of the DSC node (virtual machine)"
+  default     = "applyAndMonitor"
+}
+
+variable "dsc_config" {
+  description = "DSC node configuration assigned to the DSC node (virtual machine)"
+  default     = ""
+}
+
+variable "dsc_key" {
+  description = "Primary access ke yof the automation account DSC endpoint"
+}
+
+
