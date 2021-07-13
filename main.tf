@@ -177,6 +177,7 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
   source_image_id            = var.source_image_id != null ? var.source_image_id : null
   provision_vm_agent         = true
   allow_extension_operations = true
+  custom_data                = var.custom_data != null ? var.custom_data : null
   dedicated_host_id          = var.dedicated_host_id
   availability_set_id        = var.enable_vm_availability_set == true ? element(concat(azurerm_availability_set.aset.*.id, [""]), 0) : null
   tags                       = merge({ "ResourceName" = var.instances_count == 1 ? var.virtual_machine_name : format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1) }, var.tags, )
@@ -354,7 +355,8 @@ resource "azurerm_virtual_machine_extension" "AzureDSC" {
   settings = <<SETTINGS
   {
     "WmfVersion": "latest",
-    "ModulesUrl": "https://eus2oaasibizamarketprod1.blob.core.windows.net/automationdscpreview/RegistrationMetaConfigV2.zip",
+    "ModulesUrl": "${var.dsc_modulesurl}",
+    "SASToken": "${var.dsc_sastoken}",
     "ConfigurationFunction": "RegistrationMetaConfigV2.ps1\\RegistrationMetaConfigV2",
     "Privacy": {
       "DataCollection": ""
@@ -369,7 +371,7 @@ resource "azurerm_virtual_machine_extension" "AzureDSC" {
       "ConfigurationMode": "${var.dsc_mode}",
       "RefreshFrequencyMins": 30,
       "ConfigurationModeFrequencyMins": 15,
-      "RebootNodeIfNeeded": false,
+      "RebootNodeIfNeeded": true,
       "ActionAfterReboot": "continueConfiguration",
       "AllowModuleOverwrite": true
     }

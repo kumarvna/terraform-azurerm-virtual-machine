@@ -1,11 +1,9 @@
 variable "resource_group_name" {
   description = "A container that holds related resources for an Azure solution"
-  default     = ""
 }
 
 variable "location" {
   description = "The location/region to keep all your network resources. To get the list of all locations with table format from azure cli, run 'az account list-locations -o table'"
-  default     = ""
 }
 
 variable "virtual_network_name" {
@@ -40,7 +38,6 @@ variable "vm_storage_account_name" {
 
 variable "virtual_machine_name" {
   description = "The name of the virtual machine."
-  default     = ""
 }
 
 variable "os_flavor" {
@@ -107,6 +104,11 @@ variable "custom_image" {
     version   = string
   }))
   default = null
+}
+
+variable "custom_data" {
+  description = "Base64 encoded file of a bash script that gets run once by cloud-init upon VM creation"
+  default     = null
 }
 
 variable "linux_distribution_list" {
@@ -406,6 +408,15 @@ variable "tags" {
   default     = {}
 }
 
+variable "dsc_modulesurl" {
+  description = "Url to Zip file containing configuration script"
+}
+
+variable "dsc_sastoken" {
+  description = "SAS Token if ModulesUrl points to private Azure Blob Storage"
+  default     = ""
+}
+
 variable "dsc_endpoint" {
   description = "URL of automation account desc endpoint"
 }
@@ -421,7 +432,5 @@ variable "dsc_config" {
 }
 
 variable "dsc_key" {
-  description = "Primary access ke yof the automation account DSC endpoint"
+  description = "Primary access key of the automation account DSC endpoint"
 }
-
-
