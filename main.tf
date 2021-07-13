@@ -177,6 +177,7 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
   source_image_id            = var.source_image_id != null ? var.source_image_id : null
   provision_vm_agent         = true
   allow_extension_operations = true
+  custom_data                = var.custom_data != null ? var.custom_data : null
   dedicated_host_id          = var.dedicated_host_id
   availability_set_id        = var.enable_vm_availability_set == true ? element(concat(azurerm_availability_set.aset.*.id, [""]), 0) : null
   tags                       = merge({ "ResourceName" = var.instances_count == 1 ? var.virtual_machine_name : format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1) }, var.tags, )
@@ -331,7 +332,65 @@ resource "azurerm_virtual_machine_extension" "domjoin" {
   "Password": "${var.ad_user_password}"
   }
   PROTECTED_SETTINGS
-  depends_on         = [azurerm_windows_virtual_machine.win_vm]
+
+  depends_on = [azurerm_windows_virtual_machine.win_vm]
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
+}
+
+#---------------------------------------
+# Azure DSC onboarding for Windows Virtual Machine
+#---------------------------------------
+resource "azurerm_virtual_machine_extension" "AzureDSC" {
+  count                      = var.ad_domain_name != null && var.os_flavor == "windows" ? var.instances_count : 0
+  name                       = var.instances_count == 1 ? "AzureDSC" : format("%s%s", "AzureDSC", count.index + 1)
+  virtual_machine_id         = azurerm_windows_virtual_machine.win_vm[count.index].id
+  publisher                  = "Microsoft.Powershell"
+  type                       = "DSC"
+  type_handler_version       = "2.77"
+  auto_upgrade_minor_version = true
+
+  settings = <<SETTINGS
+  {
+    "WmfVersion": "latest",
+    "ModulesUrl": "${var.dsc_modulesurl}",
+    "SASToken": "${var.dsc_sastoken}",
+    "ConfigurationFunction": "RegistrationMetaConfigV2.ps1\\RegistrationMetaConfigV2",
+    "Privacy": {
+      "DataCollection": ""
+    },
+    "Properties": {
+      "RegistrationKey": {
+      "UserName": "PLACEHOLDER_DONOTUSE",
+      "Password": "PrivateSettingsRef:registrationKeyPrivate"
+      },
+      "RegistrationUrl" : "${var.dsc_endpoint}",
+      "NodeConfigurationName" : "${var.dsc_config}",
+      "ConfigurationMode": "${var.dsc_mode}",
+      "RefreshFrequencyMins": 30,
+      "ConfigurationModeFrequencyMins": 15,
+      "RebootNodeIfNeeded": true,
+      "ActionAfterReboot": "continueConfiguration",
+      "AllowModuleOverwrite": true
+    }
+  }
+  SETTINGS
+
+  protected_settings = <<PROTECTED_SETTINGS
+  {
+    "Items": {
+      "registrationKeyPrivate": "${var.dsc_key}"
+    }
+  }
+  PROTECTED_SETTINGS
+
+  depends_on = [azurerm_windows_virtual_machine.win_vm, azurerm_virtual_machine_extension.domjoin]
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 
