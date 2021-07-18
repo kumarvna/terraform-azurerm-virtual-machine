@@ -5,9 +5,14 @@ This terraform module is designed to deploy azure MSSQL Windows virtual machines
 ## Module Usage
 
 ```hcl
+# Azurerm provider configuration
+provider "azurerm" {
+  features {}
+}
+
 module "virtual-machine" {
   source  = "kumarvna/virtual-machine/azurerm"
-  version = "2.1.0"
+  version = "2.2.0"
 
 
   # Resource Group, location, VNet and Subnet details

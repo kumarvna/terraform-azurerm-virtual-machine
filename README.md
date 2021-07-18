@@ -2,7 +2,10 @@
 
 This terraform module is designed to deploy azure Windows or Linux virtual machines with Public IP, Availability Set and Network Security Group support.
 
-These types of resources supported:
+> **[NOTE]**
+> **This module now supports the meta arguments including `providers`, `depends_on`, `count`, and `for_each`.**
+
+## Resources Supported
 
 * [Linux Virtual Machine](https://www.terraform.io/docs/providers/azurerm/r/linux_virtual_machine.html)
 * [Windows Virtual Machine](https://www.terraform.io/docs/providers/azurerm/r/windows_virtual_machine.html)
@@ -17,9 +20,14 @@ These types of resources supported:
 ## Module Usage
 
 ```hcl
+# Azurerm provider configuration
+provider "azurerm" {
+  features {}
+}
+
 module "virtual-machine" {
   source  = "kumarvna/virtual-machine/azurerm"
-  version = "2.1.0"
+  version = "2.2.0"
 
   # Resource Group, location, VNet and Subnet details
   resource_group_name  = "rg-shared-westeurope-01"
@@ -115,7 +123,7 @@ If the pre-defined Windows or Linux variants are not sufficient then, you can sp
 ```hcl
 module "virtual-machine" {
   source  = "kumarvna/virtual-machine/azurerm"
-  version = "2.1.0"
+  version = "2.2.0"
 
   # .... omitted
 
@@ -207,7 +215,7 @@ In the Source and Destination columns, `VirtualNetwork`, `AzureLoadBalancer`, an
 ```hcl
 module "virtual-machine" {
   source  = "kumarvna/virtual-machine/azurerm"
-  version = "2.1.0"
+  version = "2.2.0"
 
   # .... omitted
   
@@ -235,54 +243,13 @@ module "virtual-machine" {
 
 ## Recommended naming and tagging conventions
 
-Well-defined naming and metadata tagging conventions help to quickly locate and manage resources. These conventions also help associate cloud usage costs with business teams via chargeback and show back accounting mechanisms.
+Applying tags to your Azure resources, resource groups, and subscriptions to logically organize them into a taxonomy. Each tag consists of a name and a value pair. For example, you can apply the name `Environment` and the value `Production` to all the resources in production.
+For recommendations on how to implement a tagging strategy, see Resource naming and tagging decision guide.
 
-### Resource naming
+>**Important** :
+Tag names are case-insensitive for operations. A tag with a tag name, regardless of the casing, is updated or retrieved. However, the resource provider might keep the casing you provide for the tag name. You'll see that casing in cost reports. **Tag values are case-sensitive.**
 
 An effective naming convention assembles resource names by using important resource information as parts of a resource's name. For example, using these [recommended naming conventions](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/naming-and-tagging#example-names), a public IP resource for a production SharePoint workload is named like this: `pip-sharepoint-prod-westus-001`.
-
-> ### Metadata tags
-
-When applying metadata tags to the cloud resources, you can include information about those assets that couldn't be included in the resource name. You can use that information to perform more sophisticated filtering and reporting on resources. This information can be used by IT or business teams to find resources or generate reports about resource usage and billing.
-
-The following list provides the recommended common tags that capture important context and information about resources. Use this list as a starting point to establish your tagging conventions.
-
-Tag Name|Description|Key|Example Value|Required?
---------|-----------|---|-------------|---------|
-Project Name|Name of the Project for the infra is created. This is mandatory to create a resource names.|ProjectName|{Project name}|Yes
-Application Name|Name of the application, service, or workload the resource is associated with.|ApplicationName|{app name}|Yes
-Approver|Name Person responsible for approving costs related to this resource.|Approver|{email}|Yes
-Business Unit|Top-level division of your company that owns the subscription or workload the resource belongs to. In smaller organizations, this may represent a single corporate or shared top-level organizational element.|BusinessUnit|FINANCE, MARKETING,{Product Name},CORP,SHARED|Yes
-Cost Center|Accounting cost center associated with this resource.|CostCenter|{number}|Yes
-Disaster Recovery|Business criticality of this application, workload, or service.|DR|Mission Critical, Critical, Essential|Yes
-Environment|Deployment environment of this application, workload, or service.|Env|Prod, Dev, QA, Stage, Test|Yes
-Owner Name|Owner of the application, workload, or service.|Owner|{email}|Yes
-Requester Name|User that requested the creation of this application.|Requestor| {email}|Yes
-Service Class|Service Level Agreement level of this application, workload, or service.|ServiceClass|Dev, Bronze, Silver, Gold|Yes
-Start Date of the project|Date when this application, workload, or service was first deployed.|StartDate|{date}|No
-End Date of the Project|Date when this application, workload, or service is planned to be retired.|EndDate|{date}|No
-
-> This module allows you to manage the above metadata tags directly or as an variable using `variables.tf`. All Azure resources which support tagging can be tagged by specifying key-values in argument `tags`. Tag `ResourceName` is added automatically to all resources.
-
-```hcl
-module "virtual-machine" {
-  source  = "kumarvna/virtual-machine/azurerm"
-  version = "2.1.0"
-
-  # Resource Group, location, VNet and Subnet details
-  resource_group_name  = "rg-hub-demo-internal-shared-westeurope-001"
-
-  # ... omitted
-
-  tags = {
-    ProjectName  = "demo-internal"
-    Env          = "dev"
-    Owner        = "user@example.com"
-    BusinessUnit = "CORP"
-    ServiceClass = "Gold"
-  }
-}
-```
 
 ## Requirements
 
