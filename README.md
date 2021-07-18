@@ -37,8 +37,8 @@ module "virtual-machine" {
   virtual_machine_name = "vm-linux"
 
   # (Optional) To enable Azure Monitoring and install log analytics agents
+  # (Optional) Specify `storage_account_name` to save monitoring logs to storage.   
   log_analytics_workspace_name = var.log_analytics_workspace_name
-  hub_storage_account_name     = var.hub_storage_account_name
 
   # Deploy log analytics agents to virtual machine. Log analytics workspace name required.
   # Defaults to `false` 
@@ -307,6 +307,9 @@ Name | Description | Type | Default
 `dedicated_host_id`|The ID of a Dedicated Host where this machine should be run on|string|`null`
 `license_type`|Specifies the type of on-premise license which should be used for this Virtual Machine. Possible values are `None`, `Windows_Client` and `Windows_Server`.|string|`"None"`
 `vm_time_zone`|Specifies the Time Zone which should be used by the Virtual Machine. Ex. `"UTC"` or `"W. Europe Standard Time"` [The possible values are defined here](https://jackstromberg.com/2017/01/list-of-time-zones-consumed-by-azure/) |string|`null`
+`log_analytics_workspace_name`|The name of log analytics workspace name|string|`null`
+`storage_account_name`|The name of the storage account name|string|`null`
+`deploy_log_analytics_agent`|Install log analytics agent to windows or linux VM|string|`false`
 `Tags`|A map of tags to add to all resources|map|`{}`
 
 ## Outputs

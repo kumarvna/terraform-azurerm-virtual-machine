@@ -40,8 +40,8 @@ data "azurerm_log_analytics_workspace" "logws" {
 }
 
 data "azurerm_storage_account" "storeacc" {
-  count               = var.hub_storage_account_name != null ? 1 : 0
-  name                = var.hub_storage_account_name
+  count               = var.storage_account_name != null ? 1 : 0
+  name                = var.storage_account_name
   resource_group_name = data.azurerm_resource_group.rg.name
 }
 
@@ -292,10 +292,10 @@ resource "azurerm_virtual_machine_extension" "omsagentlinux" {
 # azurerm monitoring diagnostics 
 #--------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "nsg" {
-  count                      = var.log_analytics_workspace_name != null && var.hub_storage_account_name != null ? 1 : 0
+  count                      = var.log_analytics_workspace_name != null || var.storage_account_name != null ? 1 : 0
   name                       = lower("nsg-${var.virtual_machine_name}-diag")
   target_resource_id         = azurerm_network_security_group.nsg.id
-  storage_account_id         = data.azurerm_storage_account.storeacc.0.id
+  storage_account_id         = var.storage_account_name != null ? data.azurerm_storage_account.storeacc.0.id : null
   log_analytics_workspace_id = data.azurerm_log_analytics_workspace.logws.0.id
 
   dynamic "log" {

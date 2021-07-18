@@ -15,8 +15,8 @@ module "virtual-machine" {
   virtual_machine_name = "vm-linux"
 
   # (Optional) To enable Azure Monitoring and install log analytics agents
+  # (Optional) Specify `storage_account_name` to save monitoring logs to storage.   
   log_analytics_workspace_name = var.log_analytics_workspace_name
-  hub_storage_account_name     = var.hub_storage_account_name
 
   # Deploy log analytics agents to virtual machine. Log analytics workspace name required.
   # Defaults to `false` 
