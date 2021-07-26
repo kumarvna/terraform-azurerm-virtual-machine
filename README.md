@@ -33,8 +33,8 @@ module "virtual-machine" {
   hub_storage_account_name     = var.hub_storage_account_id
 
   # This module support multiple Pre-Defined Linux and Windows Distributions.
-  # Linux images: ubuntu1804, ubuntu1604, centos75, centos77, centos81, coreos
-  # Windows Images: windows2012r2dc, windows2016dc, windows2019dc, windows2016dccore
+  # Linux images: ubuntu2004, ubuntu1804, ubuntu1604, centos75, centos77, centos81, coreos
+  # Windows Images: windows2019dc, windows2019dcgen2, windows2012r2dc, windows2016dc, windows2019dc, windows2016dccore
   # MSSQL 2017 images: mssql2017exp, mssql2017dev, mssql2017std, mssql2017ent
   # MSSQL 2019 images: mssql2019dev, mssql2019std, mssql2019ent
   # MSSQL 2019 Linux OS Images:
@@ -93,8 +93,8 @@ There are pre-defined Windows or Linux images available to deploy by setting up 
 
 OS type |Available Pre-defined Images|
 --------|----------------------------|
-Linux |`ubuntu1804`, `ubuntu1604`, `centos75`, `centos77`, `centos81`, `coreos`
-Windows|`windows2012r2dc`, `windows2016dc`, `windows2019dc`, `windows2016dccore`
+Linux |`ubuntu2004`, `ubuntu1804`, `ubuntu1604`, `centos75`, `centos77`, `centos81`, `coreos`
+Windows|`windows2019dc`, `windows2019dcgen2`, `windows2012r2dc`, `windows2016dc`, `windows2019dc`, `windows2016dccore`
 MS SQL 2017|`mssql2017exp`, `mssql2017dev`, `mssql2017std`, `mssql2017ent`
 MS SQL 2019|`mssql2019dev`, `mssql2019std`, `mssql2019ent`
 MS SQL 2019 Linux (RHEL8)|`mssql2019ent-rhel8`, `mssql2019std-rhel8`, `mssql2019dev-rhel8`
@@ -299,9 +299,9 @@ Name | Description | Type | Default
 `source_image_id`|The ID of an Image which each Virtual Machine should be based on|string|`null`
 `custom_image`|Provide the custom image to this module if the default variants are not sufficient|map(object)|`null`
 `linux_distribution_list`|Pre-defined Azure Linux VM images list|map(object)|`ubuntu1804`
-`linux_distribution_name`|Variable to pick an OS flavor for Linux based Virtual Machine. Possible values are `centos81`, `centos77`, `centos77`, `ubuntu1804`, `ubuntu1604`, `coreos`, `mssql2019ent-rhel8`, `mssql2019std-rhel8`, `mssql2019dev-rhel8`, `mssql2019ent-ubuntu1804`, `mssql2019std-ubuntu1804`, `mssql2019dev-ubuntu1804`|string|`ubuntu1804`
+`linux_distribution_name`|Variable to pick an OS flavor for Linux based Virtual Machine. Possible values are `centos81`, `centos77`, `centos77`, `ubuntu2004`, `ubuntu1804`, `ubuntu1604`, `coreos`, `mssql2019ent-rhel8`, `mssql2019std-rhel8`, `mssql2019dev-rhel8`, `mssql2019ent-ubuntu1804`, `mssql2019std-ubuntu1804`, `mssql2019dev-ubuntu1804`|string|`ubuntu1804`
 `windows_distribution_list`|Pre-defined Azure Windows VM images list|map(object)|`"windows2019dc"`
-`windows_distribution_name`|Variable to pick an OS flavor for Windows based VM. Possible values are `windows2012r2dc`, `windows2016dc`, `windows2019dc`, `windows2016dccore`, `mssql2017exp`, `mssql2017dev`, `mssql2017std`, `mssql2017ent`, `mssql2019dev`, `mssql2019std`, `mssql2019ent`, `mssql2019ent-byol`, `mssql2019std-byol`|string|`"windows2019dc"`
+`windows_distribution_name`|Variable to pick an OS flavor for Windows based VM. Possible values are `windows2012r2dc`, `windows2016dc`, `windows2019dc`, `windows2019dcgen2`, `windows2016dccore`, `mssql2017exp`, `mssql2017dev`, `mssql2017std`, `mssql2017ent`, `mssql2019dev`, `mssql2019std`, `mssql2019ent`, `mssql2019ent-byol`, `mssql2019std-byol`|string|`"windows2019dc"`
 `os_disk_storage_account_type`|The Type of Storage Account for Internal OS Disk. Possible values include Standard_LRS, StandardSSD_LRS and Premium_LRS.|string|`"StandardSSD_LRS"`
 `generate_admin_ssh_key`|Generates a secure private key and encodes it as PEM|string|`true`
 `admin_ssh_key_data`|specify the path to the existing SSH key to authenticate Linux virtual machine|string|`""`
