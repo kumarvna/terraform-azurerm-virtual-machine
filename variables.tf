@@ -339,6 +339,11 @@ variable "os_disk_storage_account_type" {
   default     = "StandardSSD_LRS"
 }
 
+variable "data_disks" {
+  description = "Provide the data disk parameters"
+  default     = []
+}
+
 variable "generate_admin_ssh_key" {
   description = "Generates a secure private key and encodes it as PEM."
   default     = false
