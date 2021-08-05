@@ -46,7 +46,6 @@ module "virtual-machine" {
   virtual_machine_size       = "Standard_A2_v2"
   generate_admin_ssh_key     = false
   admin_ssh_key_data         = "~/.ssh/id_rsa.pub"
-  instances_count            = 2
   enable_vm_availability_set = true
 
   # Network Seurity group port allow definitions for each Virtual Machine
@@ -113,7 +112,6 @@ module "virtual-machine" {
   # .... omitted
 
   os_flavor                  = "linux"
-  instances_count            = 2
   enable_vm_availability_set = true
   enable_public_ip_address   = true
 
@@ -277,57 +275,8 @@ module "virtual-machine" {
 }
 ```
 
-## Inputs
-
-Name | Description | Type | Default
----- | ----------- | ---- | -------
-`resource_group_name` | The name of the resource group in which resources are created | string | `""`
-`location`|The location of the resource group in which resources are created|string | `""`
-`virtual_network_name`|The name of the virtual network|string |`""`
-`subnet_name`|The name of the subnet to use in VM scale set|string |`""`
-`virtual_machine_name`|The name of the virtual machine|string | `""`
-`os_flavor`|Specify the flavor of the operating system image to deploy Virtual Machine. Possible values are `windows` and `linux`|string |`"windows"`
-`virtual_machine_size`|The Virtual Machine SKU for the Virtual Machine|string|`"Standard_A2_v2"`
-`instances_count`|The number of Virtual Machines required|number|`1`
-`enable_ip_forwarding`|Should IP Forwarding be enabled?|string|`false`
-`enable_accelerated_networking`|Should Accelerated Networking be enabled?|string|`false`
-`private_ip_address_allocation_type`|The allocation method used for the Private IP Address. Possible values are Dynamic and Static.|string|`false`
-`private_ip_address`|The Static IP Address which should be used. This is valid only when `private_ip_address_allocation` is set to `Static`.|string|`null`
-`dns_servers`|List of dns servers to use for network interface|string|`[]`
-`enable_vm_availability_set`|Manages an Availability Set for Virtual Machines.|string|`false`
-`enable_public_ip_address`|Reference to a Public IP Address to associate with the NIC|string|`false`
-`source_image_id`|The ID of an Image which each Virtual Machine should be based on|string|`null`
-`custom_image`|Provide the custom image to this module if the default variants are not sufficient|map(object)|`null`
-`linux_distribution_list`|Pre-defined Azure Linux VM images list|map(object)|`ubuntu1804`
-`linux_distribution_name`|Variable to pick an OS flavor for Linux based Virtual Machine. Possible values are `centos81`, `centos77`, `centos77`, `ubuntu2004`, `ubuntu1804`, `ubuntu1604`, `coreos`, `mssql2019ent-rhel8`, `mssql2019std-rhel8`, `mssql2019dev-rhel8`, `mssql2019ent-ubuntu1804`, `mssql2019std-ubuntu1804`, `mssql2019dev-ubuntu1804`|string|`ubuntu1804`
-`windows_distribution_list`|Pre-defined Azure Windows VM images list|map(object)|`"windows2019dc"`
-`windows_distribution_name`|Variable to pick an OS flavor for Windows based VM. Possible values are `windows2012r2dc`, `windows2016dc`, `windows2019dc`, `windows2019dcgen2`, `windows2016dccore`, `mssql2017exp`, `mssql2017dev`, `mssql2017std`, `mssql2017ent`, `mssql2019dev`, `mssql2019std`, `mssql2019ent`, `mssql2019ent-byol`, `mssql2019std-byol`|string|`"windows2019dc"`
-`os_disk_storage_account_type`|The Type of Storage Account for Internal OS Disk. Possible values include Standard_LRS, StandardSSD_LRS and Premium_LRS.|string|`"StandardSSD_LRS"`
-`generate_admin_ssh_key`|Generates a secure private key and encodes it as PEM|string|`true`
-`admin_ssh_key_data`|specify the path to the existing SSH key to authenticate Linux virtual machine|string|`""`
-`admin_username`|The username of the local administrator used for the Virtual Machine|string|`"azureadmin"`
-`admin_password`|The Password which should be used for the local-administrator on this Virtual Machine|string|`null`
-`disable_password_authentication`|Should Password Authentication be disabled on this Virtual Machine. Applicable to Linux Virtual machine|string|`true`
-`nsg_inbound_rules`|List of network rules to apply to network interface|object|`{}`
-`dedicated_host_id`|The ID of a Dedicated Host where this machine should be run on|string|`null`
-`license_type`|Specifies the type of on-premise license which should be used for this Virtual Machine. Possible values are `None`, `Windows_Client` and `Windows_Server`.|string|`"None"`
-`Tags`|A map of tags to add to all resources|map|`{}`
-
-## Outputs
-
-|Name | Description|
-|---- | -----------|
-`admin_ssh_key_public`|The generated public key data in PEM format
-`admin_ssh_key_private`|The generated private key data in PEM format
-`windows_vm_password`|Password for the windows Virtual Machine
-`windows_vm_public_ips`|Public IP's map for the all windows Virtual Machines
-`linux_vm_public_ips`|Public IP's map for the all windows Virtual Machines
-`windows_vm_private_ips`|Public IP's map for the all windows Virtual Machines
-`linux_vm_private_ips`|Public IP's map for the all windows Virtual Machines
-`linux_virtual_machine_ids`|The resource id's of all Linux Virtual Machine
-`windows_virtual_machine_ids`|The resource id's of all Windows Virtual Machine
-`network_security_group_ids`|List of Network security groups and ids
-`vm_availability_set_id`|The resource ID of Virtual Machine availability set
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
 ## Resource Graph
 
