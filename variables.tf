@@ -135,6 +135,13 @@ variable "linux_distribution_list" {
       version   = "latest"
     },
 
+    ubuntu2004 = {
+      publisher = "Canonical"
+      offer     = "UbuntuServer"
+      sku       = "20.04-LTS"
+      version   = "latest"
+    },
+
     centos75 = {
       publisher = "OpenLogic"
       offer     = "CentOS"
@@ -332,6 +339,11 @@ variable "os_disk_storage_account_type" {
   default     = "StandardSSD_LRS"
 }
 
+variable "data_disks" {
+  description = "Provide the data disk parameters"
+  default     = []
+}
+
 variable "generate_admin_ssh_key" {
   description = "Generates a secure private key and encodes it as PEM."
   default     = false
@@ -410,15 +422,17 @@ variable "tags" {
 
 variable "dsc_modulesurl" {
   description = "Url to Zip file containing configuration script"
+  default     = null
 }
 
 variable "dsc_sastoken" {
   description = "SAS Token if ModulesUrl points to private Azure Blob Storage"
-  default     = ""
+  default     = null
 }
 
 variable "dsc_endpoint" {
   description = "URL of automation account desc endpoint"
+  default     = null
 }
 
 variable "dsc_mode" {
@@ -428,9 +442,10 @@ variable "dsc_mode" {
 
 variable "dsc_config" {
   description = "DSC node configuration assigned to the DSC node (virtual machine)"
-  default     = ""
+  default     = null
 }
 
 variable "dsc_key" {
   description = "Primary access key of the automation account DSC endpoint"
+  default     = null
 }
