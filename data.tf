@@ -23,3 +23,10 @@ data "azurerm_storage_account" "storeacc" {
   name                = var.vm_storage_account_name
   resource_group_name = data.azurerm_resource_group.rg.name
 }
+
+data "azurerm_backup_policy_vm" "this" {
+  count               = var.backup != null ? 1 : 0
+  name                = var.backup.policy_name
+  recovery_vault_name = var.backup.vault_name
+  resource_group_name = var.backup.vault_rg
+}
