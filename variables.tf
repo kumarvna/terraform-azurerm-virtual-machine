@@ -50,11 +50,6 @@ variable "virtual_machine_size" {
   default     = "Standard_B2s"
 }
 
-variable "instances_count" {
-  description = "The number of Virtual Machines required."
-  default     = 1
-}
-
 variable "enable_ip_forwarding" {
   description = "Should IP Forwarding be enabled? Defaults to false"
   default     = false
@@ -93,6 +88,17 @@ variable "enable_public_ip_address" {
 variable "source_image_id" {
   description = "The ID of an Image which each Virtual Machine should be based on"
   default     = null
+}
+
+variable "backup" {
+  description = "Provide the recovery vault and backup policy details for VM backup"
+  type = object({
+    enabled     = bool
+    vault_rg    = string
+    vault_name  = string
+    policy_name = string
+  })
+  default = null
 }
 
 variable "custom_image" {
