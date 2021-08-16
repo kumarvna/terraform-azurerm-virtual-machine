@@ -335,7 +335,8 @@ No modules.
 | <a name="input_admin_password"></a> [admin\_password](#input\_admin\_password) | The Password which should be used for the local-administrator on this Virtual Machine | `any` | `null` | no |
 | <a name="input_admin_ssh_key"></a> [admin\_ssh\_key](#input\_admin\_ssh\_key) | SSH key to authenticate Linux virtual machine | `any` | `null` | no |
 | <a name="input_admin_username"></a> [admin\_username](#input\_admin\_username) | The username of the local administrator used for the Virtual Machine. | `string` | `"azureadmin"` | no |
-| <a name="input_backup"></a> [backup](#input\_backup) | Provide the recovery vault and backup policy details for VM backup | <pre>object({<br>    enabled     = bool<br>    vault_rg    = string<br>    vault_name  = string<br>    policy_name = string<br>  })</pre> | `null` | no |
+| <a name="input_backup_enabled"></a> [backup\_enabled](#input\_backup\_enabled) | n/a | `bool` | n/a | yes |
+| <a name="input_backup_settings"></a> [backup\_settings](#input\_backup\_settings) | Provide the recovery vault and backup policy details for VM backup | `map(string)` | `{}` | no |
 | <a name="input_custom_data"></a> [custom\_data](#input\_custom\_data) | Base64 encoded file of a bash script that gets run once by cloud-init upon VM creation | `any` | `null` | no |
 | <a name="input_custom_image"></a> [custom\_image](#input\_custom\_image) | Provide the custom image to this module if the default variants are not sufficient | <pre>map(object({<br>    publisher = string<br>    offer     = string<br>    sku       = string<br>    version   = string<br>  }))</pre> | `null` | no |
 | <a name="input_data_disks"></a> [data\_disks](#input\_data\_disks) | Provide the data disk parameters | `list` | `[]` | no |

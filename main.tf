@@ -282,9 +282,9 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
 # Virtual machine backup
 #---------------------------------------
 resource "azurerm_backup_protected_vm" "this" {
-  count               = var.backup.enabled ? 1 : 0
-  resource_group_name = var.backup.vault_rg
-  recovery_vault_name = var.backup.vault_name
+  count               = var.backup_enabled == true ? 1 : 0
+  resource_group_name = var.backup_settings.vault_rg
+  recovery_vault_name = var.backup_settings.vault_name
   backup_policy_id    = data.azurerm_backup_policy_vm.this[0].id
   source_vm_id        = var.os_flavor == "windows" ? azurerm_windows_virtual_machine.win_vm[0].id : azurerm_linux_virtual_machine.linux_vm[0].id
 }

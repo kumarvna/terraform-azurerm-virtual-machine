@@ -90,15 +90,15 @@ variable "source_image_id" {
   default     = null
 }
 
-variable "backup" {
+variable "backup_enabled" {
+  description = ""
+  type        = bool
+}
+
+variable "backup_settings" {
   description = "Provide the recovery vault and backup policy details for VM backup"
-  type = object({
-    enabled     = bool
-    vault_rg    = string
-    vault_name  = string
-    policy_name = string
-  })
-  default = null
+  type        = map(string)
+  default     = {}
 }
 
 variable "custom_image" {
