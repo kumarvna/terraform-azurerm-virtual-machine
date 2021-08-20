@@ -31,8 +31,8 @@ variable "log_analytics_workspace_rg" {
   default     = null
 }
 
-variable "vm_storage_account_name" {
-  description = "The name of the vm storage account to store logs"
+variable "vm_storage_account_id" {
+  description = "The name of the vm storage id to store logs"
   default     = null
 }
 
