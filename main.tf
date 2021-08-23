@@ -202,7 +202,7 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
   size                       = var.virtual_machine_size
   admin_username             = var.admin_username
   admin_password             = var.disable_password_authentication != true && var.admin_password == null ? random_password.passwd[0].result : var.admin_password
-  network_interface_ids      = azurerm_network_interface.nic.id
+  network_interface_ids      = [azurerm_network_interface.nic.id]
   source_image_id            = var.source_image_id != null ? var.source_image_id : null
   provision_vm_agent         = true
   allow_extension_operations = true
