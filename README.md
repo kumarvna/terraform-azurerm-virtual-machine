@@ -336,7 +336,7 @@ No modules.
 | <a name="input_backup_enabled"></a> [backup\_enabled](#input\_backup\_enabled) | n/a | `bool` | n/a | yes |
 | <a name="input_backup_settings"></a> [backup\_settings](#input\_backup\_settings) | Provide the recovery vault and backup policy details for VM backup | `map(string)` | `{}` | no |
 | <a name="input_custom_data"></a> [custom\_data](#input\_custom\_data) | Base64 encoded file of a bash script that gets run once by cloud-init upon VM creation | `any` | `null` | no |
-| <a name="input_custom_image"></a> [custom\_image](#input\_custom\_image) | Provide the custom image to this module if the default variants are not sufficient | <pre>map(object({<br>    publisher = string<br>    offer     = string<br>    sku       = string<br>    version   = string<br>  }))</pre> | `null` | no |
+| <a name="input_custom_image"></a> [custom\_image](#input\_custom\_image) | Provide the custom image to this module if the default variants are not sufficient | <pre>object({<br>    publisher = string<br>    offer     = string<br>    sku       = string<br>    version   = string<br>  })</pre> | `null` | no |
 | <a name="input_data_disks"></a> [data\_disks](#input\_data\_disks) | Provide the data disk parameters | `list` | `[]` | no |
 | <a name="input_dedicated_host_id"></a> [dedicated\_host\_id](#input\_dedicated\_host\_id) | The ID of a Dedicated Host where this machine should be run on. | `any` | `null` | no |
 | <a name="input_disable_password_authentication"></a> [disable\_password\_authentication](#input\_disable\_password\_authentication) | Should Password Authentication be disabled on this Virtual Machine? Defaults to true. | `bool` | `true` | no |

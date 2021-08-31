@@ -103,12 +103,12 @@ variable "backup_settings" {
 
 variable "custom_image" {
   description = "Provide the custom image to this module if the default variants are not sufficient"
-  type = map(object({
+  type = object({
     publisher = string
     offer     = string
     sku       = string
     version   = string
-  }))
+  })
   default = null
 }
 
