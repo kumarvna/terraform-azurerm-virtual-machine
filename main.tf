@@ -146,10 +146,9 @@ resource "azurerm_network_interface_security_group_association" "nsgassoc" {
 # Network Security Group diagnostics
 #--------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "nsg" {
-  count                      = var.log_analytics_workspace_name != null
+  count                      = var.log_analytics_workspace_name != null ? 1 : 0
   name                       = lower("nsg-${var.virtual_machine_name}-diag")
   target_resource_id         = azurerm_network_security_group.nsg.id
-  storage_account_id         = var.vm_storage_account_id != null
   log_analytics_workspace_id = data.azurerm_log_analytics_workspace.logws.0.id
 
   dynamic "log" {
