@@ -146,10 +146,10 @@ resource "azurerm_network_interface_security_group_association" "nsgassoc" {
 # Network Security Group diagnostics
 #--------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "nsg" {
-  count                      = var.log_analytics_workspace_name != null /*&& var.vm_storage_account_id != null*/ ? 1 : 0
+  count                      = var.log_analytics_workspace_name != null
   name                       = lower("nsg-${var.virtual_machine_name}-diag")
   target_resource_id         = azurerm_network_security_group.nsg.id
-  storage_account_id         = var.vm_storage_account_id
+  storage_account_id         = var.vm_storage_account_id != null
   log_analytics_workspace_id = data.azurerm_log_analytics_workspace.logws.0.id
 
   dynamic "log" {
@@ -170,7 +170,7 @@ resource "azurerm_monitor_diagnostic_setting" "nsg" {
 #---------------------------------------
 resource "azurerm_managed_disk" "data_disk" {
   for_each             = local.vm_data_disks
-  name                 = "${var.virtual_machine_name}-DataDisk_${each.value.idx}"
+  name                 = "${var.virtual_machine_name}_DataDisk_${each.value.idx}"
   location             = var.location
   resource_group_name  = var.resource_group_name
   storage_account_type = each.value.data_disk.storage_account_type
@@ -232,6 +232,7 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
 
   os_disk {
     storage_account_type = var.os_disk_storage_account_type
+    name                 = "${var.virtual_machine_name}_OsDisk"
     caching              = "ReadWrite"
   }
 }
@@ -274,6 +275,7 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
 
   os_disk {
     storage_account_type = var.os_disk_storage_account_type
+    name                 = "${var.virtual_machine_name}_OsDisk"
     caching              = "ReadWrite"
   }
 }
