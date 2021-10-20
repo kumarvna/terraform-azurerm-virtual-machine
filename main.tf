@@ -159,6 +159,7 @@ resource "azurerm_monitor_diagnostic_setting" "nsg" {
 
       retention_policy {
         enabled = false
+        days    = 0
       }
     }
   }
