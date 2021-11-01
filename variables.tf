@@ -117,10 +117,19 @@ variable "existing_network_security_group_id" {
   default     = null
 }
 
+variable "nsg_inbound_rules" {
+  description = "List of network rules to apply to network interface."
+  default     = []
+}
 
 variable "virtual_machine_name" {
   description = "The name of the virtual machine."
   default     = ""
+}
+
+variable "instances_count" {
+  description = "The number of Virtual Machines required."
+  default     = 1
 }
 
 variable "os_flavor" {
@@ -133,19 +142,64 @@ variable "virtual_machine_size" {
   default     = "Standard_A2_v2"
 }
 
-variable "instances_count" {
-  description = "The number of Virtual Machines required."
-  default     = 1
+variable "disable_password_authentication" {
+  description = "Should Password Authentication be disabled on this Virtual Machine? Defaults to true."
+  default     = true
 }
 
+variable "admin_username" {
+  description = "The username of the local administrator used for the Virtual Machine."
+  default     = "azureadmin"
+}
 
-
-
-
+variable "admin_password" {
+  description = "The Password which should be used for the local-administrator on this Virtual Machine"
+  default     = null
+}
 
 variable "source_image_id" {
   description = "The ID of an Image which each Virtual Machine should be based on"
   default     = null
+}
+
+variable "dedicated_host_id" {
+  description = "The ID of a Dedicated Host where this machine should be run on."
+  default     = null
+}
+
+variable "custom_data" {
+  description = "Base64 encoded file of a bash script that gets run once by cloud-init upon VM creation"
+  default     = null
+}
+
+variable "enable_encryption_at_host" {
+  description = " Should all of the disks (including the temp disk) attached to this Virtual Machine be encrypted by enabling Encryption at Host?"
+  default     = false
+}
+
+variable "virtual_machine_zone" {
+  description = "The Zone in which this Virtual Machine should be created."
+  default     = null
+}
+
+variable "license_type" {
+  description = "Specifies the type of on-premise license which should be used for this Virtual Machine. Possible values are None, Windows_Client and Windows_Server."
+  default     = "None"
+}
+
+variable "vm_time_zone" {
+  description = "Specifies the Time Zone which should be used by the Virtual Machine"
+  default     = null
+}
+
+variable "generate_admin_ssh_key" {
+  description = "Generates a secure private key and encodes it as PEM."
+  default     = true
+}
+
+variable "admin_ssh_key_data" {
+  description = "specify the path to the existing SSH key to authenticate Linux virtual machine"
+  default     = ""
 }
 
 variable "custom_image" {
@@ -377,54 +431,10 @@ variable "enable_ultra_ssd_data_disk_storage_support" {
   description = "Should the capacity to enable Data Disks of the UltraSSD_LRS storage account type be supported on this Virtual Machine"
   default     = false
 }
-variable "generate_admin_ssh_key" {
-  description = "Generates a secure private key and encodes it as PEM."
-  default     = true
-}
 
-variable "admin_ssh_key_data" {
-  description = "specify the path to the existing SSH key to authenticate Linux virtual machine"
-  default     = ""
-}
 
-variable "disable_password_authentication" {
-  description = "Should Password Authentication be disabled on this Virtual Machine? Defaults to true."
-  default     = true
-}
 
-variable "admin_username" {
-  description = "The username of the local administrator used for the Virtual Machine."
-  default     = "azureadmin"
-}
 
-variable "admin_password" {
-  description = "The Password which should be used for the local-administrator on this Virtual Machine"
-  default     = null
-}
-
-variable "nsg_inbound_rules" {
-  description = "List of network rules to apply to network interface."
-  default     = []
-}
-
-variable "dedicated_host_id" {
-  description = "The ID of a Dedicated Host where this machine should be run on."
-  default     = null
-}
-
-variable "license_type" {
-  description = "Specifies the type of on-premise license which should be used for this Virtual Machine. Possible values are None, Windows_Client and Windows_Server."
-  default     = "None"
-}
-variable "enable_encryption_at_host" {
-  description = " Should all of the disks (including the temp disk) attached to this Virtual Machine be encrypted by enabling Encryption at Host?"
-  default     = false
-}
-
-variable "vm_time_zone" {
-  description = "Specifies the Time Zone which should be used by the Virtual Machine"
-  default     = null
-}
 
 variable "nsg_diag_logs" {
   description = "NSG Monitoring Category details for Azure Diagnostic setting"

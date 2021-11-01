@@ -162,21 +162,25 @@ resource "azurerm_network_interface_security_group_association" "nsgassoc" {
 # Linux Virutal machine
 #---------------------------------------
 resource "azurerm_linux_virtual_machine" "linux_vm" {
-  count                      = var.os_flavor == "linux" ? var.instances_count : 0
-  name                       = var.instances_count == 1 ? var.virtual_machine_name : format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1)
-  resource_group_name        = data.azurerm_resource_group.rg.name
-  location                   = data.azurerm_resource_group.rg.location
-  size                       = var.virtual_machine_size
-  admin_username             = var.admin_username
-  admin_password             = var.disable_password_authentication != true && var.admin_password == null ? element(concat(random_password.passwd.*.result, [""]), 0) : var.admin_password
-  network_interface_ids      = [element(concat(azurerm_network_interface.nic.*.id, [""]), count.index)]
-  source_image_id            = var.source_image_id != null ? var.source_image_id : null
-  provision_vm_agent         = true
-  allow_extension_operations = true
-  dedicated_host_id          = var.dedicated_host_id
-  availability_set_id        = var.enable_vm_availability_set == true ? element(concat(azurerm_availability_set.aset.*.id, [""]), 0) : null
-  encryption_at_host_enabled = var.enable_encryption_at_host
-  tags                       = merge({ "ResourceName" = var.instances_count == 1 ? var.virtual_machine_name : format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1) }, var.tags, )
+  count                           = var.os_flavor == "linux" ? var.instances_count : 0
+  name                            = var.instances_count == 1 ? substr(var.virtual_machine_name, 0, 15) : substr(format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1), 0, 15)
+  resource_group_name             = data.azurerm_resource_group.rg.name
+  location                        = data.azurerm_resource_group.rg.location
+  size                            = var.virtual_machine_size
+  admin_username                  = var.admin_username
+  admin_password                  = var.disable_password_authentication != true && var.admin_password == null ? element(concat(random_password.passwd.*.result, [""]), 0) : var.admin_password
+  disable_password_authentication = var.disable_password_authentication
+  network_interface_ids           = [element(concat(azurerm_network_interface.nic.*.id, [""]), count.index)]
+  source_image_id                 = var.source_image_id != null ? var.source_image_id : null
+  provision_vm_agent              = true
+  allow_extension_operations      = true
+  dedicated_host_id               = var.dedicated_host_id
+  custom_data                     = var.custom_data != null ? var.custom_data : null
+  availability_set_id             = var.enable_vm_availability_set == true ? element(concat(azurerm_availability_set.aset.*.id, [""]), 0) : null
+  encryption_at_host_enabled      = var.enable_encryption_at_host
+  proximity_placement_group_id    = var.enable_proximity_placement_group ? azurerm_proximity_placement_group.appgrp.0.id : null
+  zone                            = var.virtual_machine_zone
+  tags                            = merge({ "ResourceName" = var.instances_count == 1 ? var.virtual_machine_name : format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1) }, var.tags, )
 
   admin_ssh_key {
     username   = var.admin_username
