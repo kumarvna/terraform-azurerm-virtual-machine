@@ -54,17 +54,7 @@ resource "random_password" "passwd" {
   special     = false
 
   keepers = {
-    admin_password = var.os_flavor
-  }
-}
-
-resource "random_string" "str" {
-  count   = var.enable_public_ip_address == true ? var.instances_count : 0
-  length  = 6
-  special = false
-  upper   = false
-  keepers = {
-    domain_name_label = var.virtual_machine_name
+    admin_password = var.virtual_machine_name
   }
 }
 
@@ -78,7 +68,9 @@ resource "azurerm_public_ip" "pip" {
   resource_group_name = data.azurerm_resource_group.rg.name
   allocation_method   = var.public_ip_allocation_method
   sku                 = var.public_ip_sku
-  domain_name_label   = format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), random_string.str[count.index].result)
+  sku_tier            = var.public_ip_sku_tier
+  domain_name_label   = var.domain_name_label
+  availability_zone   = var.public_ip_availability_zone
   tags                = merge({ "ResourceName" = lower("pip-vm-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}-0${count.index + 1}") }, var.tags, )
 }
 
@@ -93,6 +85,7 @@ resource "azurerm_network_interface" "nic" {
   dns_servers                   = var.dns_servers
   enable_ip_forwarding          = var.enable_ip_forwarding
   enable_accelerated_networking = var.enable_accelerated_networking
+  internal_dns_name_label       = var.internal_dns_name_label
   tags                          = merge({ "ResourceName" = var.instances_count == 1 ? lower("nic-${format("vm%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")))}") : lower("nic-${format("vm%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1)}") }, var.tags, )
 
   ip_configuration {
@@ -105,6 +98,20 @@ resource "azurerm_network_interface" "nic" {
   }
 }
 
+#----------------------------------------------------------------------------------------------------
+# Proximity placement group for virtual machines, virtual machine scale sets and availability sets.
+#----------------------------------------------------------------------------------------------------
+resource "azurerm_proximity_placement_group" "appgrp" {
+  count               = var.enable_proximity_placement_group ? 1 : 0
+  name                = lower("proxigrp-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}")
+  resource_group_name = data.azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  tags                = merge({ "ResourceName" = lower("proxigrp-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}") }, var.tags, )
+}
+
+#-----------------------------------------------------
+# Manages an Availability Set for Virtual Machines.
+#-----------------------------------------------------
 resource "azurerm_availability_set" "aset" {
   count                        = var.enable_vm_availability_set ? 1 : 0
   name                         = lower("avail-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}")
@@ -112,6 +119,7 @@ resource "azurerm_availability_set" "aset" {
   location                     = data.azurerm_resource_group.rg.location
   platform_fault_domain_count  = var.platform_fault_domain_count
   platform_update_domain_count = var.platform_update_domain_count
+  proximity_placement_group_id = var.enable_proximity_placement_group ? azurerm_proximity_placement_group.appgrp.0.id : null
   managed                      = true
   tags                         = merge({ "ResourceName" = lower("avail-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}") }, var.tags, )
 }
@@ -120,6 +128,7 @@ resource "azurerm_availability_set" "aset" {
 # Network security group for Virtual Machine Network Interface
 #---------------------------------------------------------------
 resource "azurerm_network_security_group" "nsg" {
+  count               = var.existing_network_security_group_id == null ? 1 : 0
   name                = lower("nsg_${var.virtual_machine_name}_${data.azurerm_resource_group.rg.location}_in")
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
@@ -127,7 +136,7 @@ resource "azurerm_network_security_group" "nsg" {
 }
 
 resource "azurerm_network_security_rule" "nsg_rule" {
-  for_each                    = local.nsg_inbound_rules
+  for_each                    = { for k, v in local.nsg_inbound_rules : k => v if k != null }
   name                        = each.key
   priority                    = 100 * (each.value.idx + 1)
   direction                   = "Inbound"
@@ -139,15 +148,14 @@ resource "azurerm_network_security_rule" "nsg_rule" {
   destination_address_prefix  = element(concat(data.azurerm_subnet.snet.address_prefixes, [""]), 0)
   description                 = "Inbound_Port_${each.value.security_rule.destination_port_range}"
   resource_group_name         = data.azurerm_resource_group.rg.name
-  network_security_group_name = azurerm_network_security_group.nsg.name
+  network_security_group_name = azurerm_network_security_group.nsg.0.name
   depends_on                  = [azurerm_network_security_group.nsg]
 }
-
 
 resource "azurerm_network_interface_security_group_association" "nsgassoc" {
   count                     = var.instances_count
   network_interface_id      = element(concat(azurerm_network_interface.nic.*.id, [""]), count.index)
-  network_security_group_id = azurerm_network_security_group.nsg.id
+  network_security_group_id = var.existing_network_security_group_id == null ? azurerm_network_security_group.nsg.0.id : var.existing_network_security_group_id
 }
 
 #---------------------------------------
@@ -292,9 +300,9 @@ resource "azurerm_virtual_machine_extension" "omsagentlinux" {
 # azurerm monitoring diagnostics 
 #--------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "nsg" {
-  count                      = var.log_analytics_workspace_name != null || var.storage_account_name != null ? 1 : 0
+  count                      = var.existing_network_security_group_id == null && var.log_analytics_workspace_name != null ? 1 : 0
   name                       = lower("nsg-${var.virtual_machine_name}-diag")
-  target_resource_id         = azurerm_network_security_group.nsg.id
+  target_resource_id         = azurerm_network_security_group.nsg.*.id
   storage_account_id         = var.storage_account_name != null ? data.azurerm_storage_account.storeacc.0.id : null
   log_analytics_workspace_id = data.azurerm_log_analytics_workspace.logws.0.id
 

@@ -33,6 +33,91 @@ variable "random_password_length" {
   default     = 24
 }
 
+variable "enable_public_ip_address" {
+  description = "Reference to a Public IP Address to associate with the NIC"
+  default     = null
+}
+
+variable "public_ip_allocation_method" {
+  description = "Defines the allocation method for this IP address. Possible values are `Static` or `Dynamic`"
+  default     = "Static"
+}
+
+variable "public_ip_sku" {
+  description = "The SKU of the Public IP. Accepted values are `Basic` and `Standard`"
+  default     = "Standard"
+}
+
+variable "domain_name_label" {
+  description = "Label for the Domain Name. Will be used to make up the FQDN. If a domain name label is specified, an A DNS record is created for the public IP in the Microsoft Azure DNS system."
+  default     = null
+}
+
+variable "public_ip_availability_zone" {
+  description = "The availability zone to allocate the Public IP in. Possible values are `Zone-Redundant`, `1`,`2`, `3`, and `No-Zone`"
+  default     = "Zone-Redundant"
+}
+
+variable "public_ip_sku_tier" {
+  description = "The SKU Tier that should be used for the Public IP. Possible values are `Regional` and `Global`"
+  default     = "Regional"
+}
+
+variable "dns_servers" {
+  description = "List of dns servers to use for network interface"
+  default     = []
+}
+
+variable "enable_ip_forwarding" {
+  description = "Should IP Forwarding be enabled? Defaults to false"
+  default     = false
+}
+
+variable "enable_accelerated_networking" {
+  description = "Should Accelerated Networking be enabled? Defaults to false."
+  default     = false
+}
+
+variable "internal_dns_name_label" {
+  description = "The (relative) DNS Name used for internal communications between Virtual Machines in the same Virtual Network."
+  default     = null
+}
+
+variable "private_ip_address_allocation_type" {
+  description = "The allocation method used for the Private IP Address. Possible values are Dynamic and Static."
+  default     = "Dynamic"
+}
+
+variable "private_ip_address" {
+  description = "The Static IP Address which should be used. This is valid only when `private_ip_address_allocation` is set to `Static` "
+  default     = null
+}
+
+variable "enable_vm_availability_set" {
+  description = "Manages an Availability Set for Virtual Machines."
+  default     = false
+}
+
+variable "platform_fault_domain_count" {
+  description = "Specifies the number of fault domains that are used"
+  default     = 3
+}
+variable "platform_update_domain_count" {
+  description = "Specifies the number of update domains that are used"
+  default     = 5
+}
+
+variable "enable_proximity_placement_group" {
+  description = "Manages a proximity placement group for virtual machines, virtual machine scale sets and availability sets."
+  default     = false
+}
+
+variable "existing_network_security_group_id" {
+  description = "The resource id of existing network security group"
+  default     = null
+}
+
+
 variable "virtual_machine_name" {
   description = "The name of the virtual machine."
   default     = ""
@@ -53,59 +138,10 @@ variable "instances_count" {
   default     = 1
 }
 
-variable "enable_ip_forwarding" {
-  description = "Should IP Forwarding be enabled? Defaults to false"
-  default     = false
-}
 
-variable "enable_accelerated_networking" {
-  description = "Should Accelerated Networking be enabled? Defaults to false."
-  default     = false
-}
 
-variable "private_ip_address_allocation_type" {
-  description = "The allocation method used for the Private IP Address. Possible values are Dynamic and Static."
-  default     = "Dynamic"
-}
 
-variable "private_ip_address" {
-  description = "The Static IP Address which should be used. This is valid only when `private_ip_address_allocation` is set to `Static` "
-  default     = null
-}
 
-variable "dns_servers" {
-  description = "List of dns servers to use for network interface"
-  default     = []
-}
-
-variable "enable_vm_availability_set" {
-  description = "Manages an Availability Set for Virtual Machines."
-  default     = false
-}
-
-variable "platform_fault_domain_count" {
-  description = "Specifies the number of fault domains that are used"
-  default     = 3
-}
-variable "platform_update_domain_count" {
-  description = "Specifies the number of update domains that are used"
-  default     = 5
-}
-
-variable "enable_public_ip_address" {
-  description = "Reference to a Public IP Address to associate with the NIC"
-  default     = null
-}
-
-variable "public_ip_allocation_method" {
-  description = "Defines the allocation method for this IP address. Possible values are `Static` or `Dynamic`"
-  default     = "Static"
-}
-
-variable "public_ip_sku" {
-  description = "The SKU of the Public IP. Accepted values are `Basic` and `Standard`"
-  default     = "Standard"
-}
 
 variable "source_image_id" {
   description = "The ID of an Image which each Virtual Machine should be based on"
