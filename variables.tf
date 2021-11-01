@@ -427,13 +427,40 @@ variable "os_disk_storage_account_type" {
   default     = "StandardSSD_LRS"
 }
 
+variable "os_disk_caching" {
+  description = "The Type of Caching which should be used for the Internal OS Disk. Possible values are `None`, `ReadOnly` and `ReadWrite`"
+  default     = "ReadWrite"
+}
+
+variable "disk_encryption_set_id" {
+  description = "The ID of the Disk Encryption Set which should be used to Encrypt this OS Disk. The Disk Encryption Set must have the `Reader` Role Assignment scoped on the Key Vault - in addition to an Access Policy to the Key Vault"
+  default     = null
+}
+
+variable "disk_size_gb" {
+  description = "The Size of the Internal OS Disk in GB, if you wish to vary from the size used in the image this Virtual Machine is sourced from."
+  default     = null
+}
+
+variable "enable_os_disk_write_accelerator" {
+  description = "hould Write Accelerator be Enabled for this OS Disk? This requires that the `storage_account_type` is set to `Premium_LRS` and that `caching` is set to `None`."
+  default     = false
+}
+
 variable "enable_ultra_ssd_data_disk_storage_support" {
   description = "Should the capacity to enable Data Disks of the UltraSSD_LRS storage account type be supported on this Virtual Machine"
   default     = false
 }
 
+variable "managed_identity_type" {
+  description = "The type of Managed Identity which should be assigned to the Linux Virtual Machine. Possible values are `SystemAssigned`, `UserAssigned` and `SystemAssigned, UserAssigned`"
+  default     = null
+}
 
-
+variable "managed_identity_ids" {
+  description = "A list of User Managed Identity ID's which should be assigned to the Linux Virtual Machine."
+  default     = null
+}
 
 
 variable "nsg_diag_logs" {

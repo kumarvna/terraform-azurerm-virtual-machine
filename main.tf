@@ -198,12 +198,23 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
   }
 
   os_disk {
-    storage_account_type = var.os_disk_storage_account_type
-    caching              = "ReadWrite"
+    storage_account_type      = var.os_disk_storage_account_type
+    caching                   = var.os_disk_caching
+    disk_encryption_set_id    = var.disk_encryption_set_id
+    disk_size_gb              = var.disk_size_gb
+    write_accelerator_enabled = var.enable_os_disk_write_accelerator
   }
 
   additional_capabilities {
     ultra_ssd_enabled = var.enable_ultra_ssd_data_disk_storage_support
+  }
+
+  dynamic "identity" {
+    for_each = var.managed_identity_type != null ? [1] : [0]
+    content {
+      type         = var.managed_identity_type
+      identity_ids = var.managed_identity_type == "UserAssigned" || var.managed_identity_type == "SystemAssigned, UserAssigned" ? var.managed_identity_ids : null
+    }
   }
 }
 
