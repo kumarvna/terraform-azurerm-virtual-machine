@@ -16,7 +16,7 @@ locals {
 # Generates SSH2 key Pair for Linux VM's (Dev Environment only)
 #---------------------------------------------------------------
 resource "tls_private_key" "rsa" {
-  count     = var.generate_admin_ssh_key == true && var.os_flavor == "linux" ? 1 : 0
+  count     = var.disable_password_authentication == true && var.generate_admin_ssh_key == true && var.os_flavor == "linux" ? 1 : 0
   algorithm = "RSA"
   rsa_bits  = 4096
 }
@@ -82,6 +82,7 @@ resource "azurerm_public_ip" "pip" {
   lifecycle {
     ignore_changes = [
       tags,
+      ip_tags,
     ]
   }
 }
@@ -204,7 +205,7 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
   location                        = data.azurerm_resource_group.rg.location
   size                            = var.virtual_machine_size
   admin_username                  = var.admin_username
-  admin_password                  = var.disable_password_authentication != true && var.admin_password == null ? element(concat(random_password.passwd.*.result, [""]), 0) : var.admin_password
+  admin_password                  = var.disable_password_authentication == false && var.admin_password == null ? element(concat(random_password.passwd.*.result, [""]), 0) : var.admin_password
   disable_password_authentication = var.disable_password_authentication
   network_interface_ids           = [element(concat(azurerm_network_interface.nic.*.id, [""]), count.index)]
   source_image_id                 = var.source_image_id != null ? var.source_image_id : null
@@ -218,9 +219,12 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
   zone                            = var.vm_availability_zone
   tags                            = merge({ "ResourceName" = var.instances_count == 1 ? var.virtual_machine_name : format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1) }, var.tags, )
 
-  admin_ssh_key {
-    username   = var.admin_username
-    public_key = var.generate_admin_ssh_key == true && var.os_flavor == "linux" ? tls_private_key.rsa[0].public_key_openssh : file(var.admin_ssh_key_data)
+  dynamic "admin_ssh_key" {
+    for_each = var.disable_password_authentication == true ? [1] : []
+    content {
+      username   = var.admin_username
+      public_key = var.generate_admin_ssh_key == true && var.os_flavor == "linux" ? tls_private_key.rsa[0].public_key_openssh : file(var.admin_ssh_key_data)
+    }
   }
 
   dynamic "source_image_reference" {
@@ -456,6 +460,7 @@ resource "azurerm_monitor_diagnostic_setting" "nsg" {
 
       retention_policy {
         enabled = false
+        days    = 0
       }
     }
   }
