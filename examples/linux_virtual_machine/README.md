@@ -65,7 +65,6 @@ module "virtual-machine" {
 
   # Attach a managed data disk to a Windows/Linux VM's 
   # Initialize a new data disk - you need to connect to the VM and run diskmanagemnet or fdisk
-
   data_disks = [
     {
       name                 = "disk1"
