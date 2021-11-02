@@ -729,8 +729,18 @@ variable "nsg_diag_logs" {
   default     = ["NetworkSecurityGroupEvent", "NetworkSecurityGroupRuleCounter"]
 }
 
-variable "log_analytics_workspace_name" {
-  description = "The name of log analytics workspace name"
+variable "log_analytics_workspace_id" {
+  description = "The name of log analytics workspace resource id"
+  default     = null
+}
+
+variable "log_analytics_customer_id" {
+  description = "The Workspace (or Customer) ID for the Log Analytics Workspace."
+  default     = null
+}
+
+variable "log_analytics_workspace_primary_shared_key" {
+  description = "The Primary shared key for the Log Analytics Workspace"
   default     = null
 }
 

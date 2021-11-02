@@ -12,6 +12,11 @@ provider "azurerm" {
   features {}
 }
 
+data "azurerm_log_analytics_workspace" "example" {
+  name                = "loganalytics-we-sharedtest2"
+  resource_group_name = "rg-shared-westeurope-01"
+}
+
 module "virtual-machine" {
   source  = "kumarvna/virtual-machine/azurerm"
   version = "2.3.0"
@@ -81,10 +86,13 @@ module "virtual-machine" {
 
   # (Optional) To enable Azure Monitoring and install log analytics agents
   # (Optional) Specify `storage_account_name` to save monitoring logs to storage.   
-  log_analytics_workspace_name = var.log_analytics_workspace_name
+  log_analytics_workspace_id = data.azurerm_log_analytics_workspace.example.id
 
-  # Deploy log analytics agents to virtual machine. Log analytics workspace name required.
-  deploy_log_analytics_agent = false
+  # Deploy log analytics agents to virtual machine. 
+  # Log analytics workspace customer id and primary shared key required.
+  deploy_log_analytics_agent                 = true
+  log_analytics_customer_id                  = data.azurerm_log_analytics_workspace.example.workspace_id
+  log_analytics_workspace_primary_shared_key = data.azurerm_log_analytics_workspace.example.primary_shared_key
 
   # Adding additional TAG's to your Azure resources
   tags = {

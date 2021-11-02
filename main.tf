@@ -39,12 +39,6 @@ data "azurerm_subnet" "snet" {
   resource_group_name  = data.azurerm_resource_group.rg.name
 }
 
-data "azurerm_log_analytics_workspace" "logws" {
-  count               = var.log_analytics_workspace_name != null ? 1 : 0
-  name                = var.log_analytics_workspace_name
-  resource_group_name = data.azurerm_resource_group.rg.name
-}
-
 data "azurerm_storage_account" "storeacc" {
   count               = var.storage_account_name != null ? 1 : 0
   name                = var.storage_account_name
@@ -395,7 +389,7 @@ resource "azurerm_virtual_machine_data_disk_attachment" "data_disk" {
 # Azure Log Analytics Workspace Agent Installation for windows
 #--------------------------------------------------------------
 resource "azurerm_virtual_machine_extension" "omsagentwin" {
-  count                      = var.deploy_log_analytics_agent && var.log_analytics_workspace_name != null && var.os_flavor == "windows" ? var.instances_count : 0
+  count                      = var.deploy_log_analytics_agent && var.log_analytics_workspace_id != null && var.os_flavor == "windows" ? var.instances_count : 0
   name                       = var.instances_count == 1 ? "OmsAgentForWindows" : format("%s%s", "OmsAgentForWindows", count.index + 1)
   virtual_machine_id         = azurerm_windows_virtual_machine.win_vm[count.index].id
   publisher                  = "Microsoft.EnterpriseCloud.Monitoring"
@@ -405,13 +399,13 @@ resource "azurerm_virtual_machine_extension" "omsagentwin" {
 
   settings = <<SETTINGS
     {
-      "workspaceId": "${data.azurerm_log_analytics_workspace.logws.0.workspace_id}"
+      "workspaceId": "${var.log_analytics_customer_id}"
     }
   SETTINGS
 
   protected_settings = <<PROTECTED_SETTINGS
     {
-    "workspaceKey": "${data.azurerm_log_analytics_workspace.logws.0.primary_shared_key}"
+    "workspaceKey": "${var.log_analytics_workspace_primary_shared_key}"
     }
   PROTECTED_SETTINGS
 }
@@ -420,7 +414,7 @@ resource "azurerm_virtual_machine_extension" "omsagentwin" {
 # Azure Log Analytics Workspace Agent Installation for Linux
 #--------------------------------------------------------------
 resource "azurerm_virtual_machine_extension" "omsagentlinux" {
-  count                      = var.deploy_log_analytics_agent && var.log_analytics_workspace_name != null && var.os_flavor == "linux" ? var.instances_count : 0
+  count                      = var.deploy_log_analytics_agent && var.log_analytics_workspace_id != null && var.os_flavor == "linux" ? var.instances_count : 0
   name                       = var.instances_count == 1 ? "OmsAgentForLinux" : format("%s%s", "OmsAgentForLinux", count.index + 1)
   virtual_machine_id         = azurerm_linux_virtual_machine.linux_vm[count.index].id
   publisher                  = "Microsoft.EnterpriseCloud.Monitoring"
@@ -430,13 +424,13 @@ resource "azurerm_virtual_machine_extension" "omsagentlinux" {
 
   settings = <<SETTINGS
     {
-      "workspaceId": "${data.azurerm_log_analytics_workspace.logws.0.workspace_id}"
+      "workspaceId": "${var.log_analytics_customer_id}"
     }
   SETTINGS
 
   protected_settings = <<PROTECTED_SETTINGS
     {
-    "workspaceKey": "${data.azurerm_log_analytics_workspace.logws.0.primary_shared_key}"
+    "workspaceKey": "${var.log_analytics_workspace_primary_shared_key}"
     }
   PROTECTED_SETTINGS
 }
@@ -446,11 +440,11 @@ resource "azurerm_virtual_machine_extension" "omsagentlinux" {
 # azurerm monitoring diagnostics 
 #--------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "nsg" {
-  count                      = var.existing_network_security_group_id == null && var.log_analytics_workspace_name != null ? 1 : 0
+  count                      = var.existing_network_security_group_id == null && var.log_analytics_workspace_id != null ? 1 : 0
   name                       = lower("nsg-${var.virtual_machine_name}-diag")
   target_resource_id         = azurerm_network_security_group.nsg.0.id
   storage_account_id         = var.storage_account_name != null ? data.azurerm_storage_account.storeacc.0.id : null
-  log_analytics_workspace_id = data.azurerm_log_analytics_workspace.logws.0.id
+  log_analytics_workspace_id = var.log_analytics_workspace_id
 
   dynamic "log" {
     for_each = var.nsg_diag_logs
