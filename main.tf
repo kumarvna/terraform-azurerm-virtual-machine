@@ -16,7 +16,7 @@ locals {
 # Generates SSH2 key Pair for Linux VM's (Dev Environment only)
 #---------------------------------------------------------------
 resource "tls_private_key" "rsa" {
-  count     = var.disable_password_authentication == true && var.generate_admin_ssh_key == true && var.os_flavor == "linux" ? 1 : 0
+  count     = var.generate_admin_ssh_key ? 1 : 0
   algorithm = "RSA"
   rsa_bits  = 4096
 }
@@ -52,7 +52,7 @@ data "azurerm_storage_account" "storeacc" {
 }
 
 resource "random_password" "passwd" {
-  count       = var.admin_password == null ? 1 : 0
+  count       = (var.os_flavor == "linux" && var.disable_password_authentication == false && var.admin_password == null ? 1 : (var.os_flavor == "windows" && var.admin_password == null ? 1 : 0))
   length      = var.random_password_length
   min_upper   = 4
   min_lower   = 2
@@ -220,10 +220,10 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
   tags                            = merge({ "ResourceName" = var.instances_count == 1 ? var.virtual_machine_name : format("%s%s", lower(replace(var.virtual_machine_name, "/[[:^alnum:]]/", "")), count.index + 1) }, var.tags, )
 
   dynamic "admin_ssh_key" {
-    for_each = var.disable_password_authentication == true ? [1] : []
+    for_each = var.disable_password_authentication ? [1] : []
     content {
       username   = var.admin_username
-      public_key = var.generate_admin_ssh_key == true && var.os_flavor == "linux" ? tls_private_key.rsa[0].public_key_openssh : file(var.admin_ssh_key_data)
+      public_key = var.admin_ssh_key_data == null ? tls_private_key.rsa[0].public_key_openssh : file(var.admin_ssh_key_data)
     }
   }
 

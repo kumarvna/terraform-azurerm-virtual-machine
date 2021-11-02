@@ -204,12 +204,12 @@ variable "vm_time_zone" {
 
 variable "generate_admin_ssh_key" {
   description = "Generates a secure private key and encodes it as PEM."
-  default     = true
+  default     = false
 }
 
 variable "admin_ssh_key_data" {
   description = "specify the path to the existing SSH key to authenticate Linux virtual machine"
-  default     = ""
+  default     = null
 }
 
 variable "custom_image" {
@@ -251,13 +251,6 @@ variable "linux_distribution_list" {
       publisher = "Canonical"
       offer     = "0001-com-ubuntu-server-focal-daily"
       sku       = "20_04-daily-lts-gen2"
-      version   = "latest"
-    },
-
-    centos75 = {
-      publisher = "OpenLogic"
-      offer     = "CentOS"
-      sku       = "7.5"
       version   = "latest"
     },
 
