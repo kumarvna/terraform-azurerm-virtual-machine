@@ -172,14 +172,24 @@ variable "custom_data" {
   default     = null
 }
 
+variable "enable_automatic_updates" {
+  description = "Specifies if Automatic Updates are Enabled for the Windows Virtual Machine."
+  default     = false
+}
+
 variable "enable_encryption_at_host" {
   description = " Should all of the disks (including the temp disk) attached to this Virtual Machine be encrypted by enabling Encryption at Host?"
   default     = false
 }
 
-variable "virtual_machine_zone" {
-  description = "The Zone in which this Virtual Machine should be created."
+variable "vm_availability_zone" {
+  description = "The Zone in which this Virtual Machine should be created. Conflicts with availability set and shouldn't use both"
   default     = null
+}
+
+variable "patch_mode" {
+  description = "Specifies the mode of in-guest patching to this Windows Virtual Machine. Possible values are `Manual`, `AutomaticByOS` and `AutomaticByPlatform`"
+  default     = "AutomaticByOS"
 }
 
 variable "license_type" {
@@ -447,6 +457,11 @@ variable "enable_os_disk_write_accelerator" {
   default     = false
 }
 
+variable "os_disk_name" {
+  description = "The name which should be used for the Internal OS Disk"
+  default     = null
+}
+
 variable "enable_ultra_ssd_data_disk_storage_support" {
   description = "Should the capacity to enable Data Disks of the UltraSSD_LRS storage account type be supported on this Virtual Machine"
   default     = false
@@ -462,6 +477,25 @@ variable "managed_identity_ids" {
   default     = null
 }
 
+variable "winrm_protocol" {
+  description = "Specifies Specifies the protocol of listener. Possible values are `Http` or `Https`"
+  default     = null
+}
+
+variable "key_vault_certificate_secret_url" {
+  description = "he Secret URL of a Key Vault Certificate, which must be specified when `protocol` is set to `Https`"
+  default     = null
+}
+
+variable "additional_unattend_content" {
+  description = "The XML formatted content that is added to the unattend.xml file for the specified path and component."
+  default     = null
+}
+
+variable "additional_unattend_content_setting" {
+  description = "The name of the setting to which the content applies. Possible values are `AutoLogon` and `FirstLogonCommands`"
+  default     = null
+}
 
 variable "nsg_diag_logs" {
   description = "NSG Monitoring Category details for Azure Diagnostic setting"
