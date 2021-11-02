@@ -247,6 +247,13 @@ variable "linux_distribution_list" {
       version   = "latest"
     },
 
+    ubuntu2004 = {
+      publisher = "Canonical"
+      offer     = "0001-com-ubuntu-server-focal-daily"
+      sku       = "20_04-daily-lts-gen2"
+      version   = "latest"
+    },
+
     centos75 = {
       publisher = "OpenLogic"
       offer     = "CentOS"
@@ -261,6 +268,20 @@ variable "linux_distribution_list" {
       version   = "latest"
     },
 
+    centos78-gen2 = {
+      publisher = "OpenLogic"
+      offer     = "CentOS"
+      sku       = "7_8-gen2"
+      version   = "latest"
+    },
+
+    centos79-gen2 = {
+      publisher = "OpenLogic"
+      offer     = "CentOS"
+      sku       = "7_9-gen2"
+      version   = "latest"
+    },
+
     centos81 = {
       publisher = "OpenLogic"
       offer     = "CentOS"
@@ -268,10 +289,136 @@ variable "linux_distribution_list" {
       version   = "latest"
     },
 
+    centos81-gen2 = {
+      publisher = "OpenLogic"
+      offer     = "CentOS"
+      sku       = "8_1-gen2"
+      version   = "latest"
+    },
+
+    centos82-gen2 = {
+      publisher = "OpenLogic"
+      offer     = "CentOS"
+      sku       = "8_2-gen2"
+      version   = "latest"
+    },
+
+    centos83-gen2 = {
+      publisher = "OpenLogic"
+      offer     = "CentOS"
+      sku       = "8_3-gen2"
+      version   = "latest"
+    },
+
+    centos84-gen2 = {
+      publisher = "OpenLogic"
+      offer     = "CentOS"
+      sku       = "8_4-gen2"
+      version   = "latest"
+    },
+
     coreos = {
       publisher = "CoreOS"
       offer     = "CoreOS"
       sku       = "Stable"
+      version   = "latest"
+    },
+
+    rhel78 = {
+      publisher = "RedHat"
+      offer     = "RHEL"
+      sku       = "7.8"
+      version   = "latest"
+    },
+
+    rhel78-gen2 = {
+      publisher = "RedHat"
+      offer     = "RHEL"
+      sku       = "78-gen2"
+      version   = "latest"
+    },
+
+    rhel79 = {
+      publisher = "RedHat"
+      offer     = "RHEL"
+      sku       = "7.9"
+      version   = "latest"
+    },
+
+    rhel79-gen2 = {
+      publisher = "RedHat"
+      offer     = "RHEL"
+      sku       = "79-gen2"
+      version   = "latest"
+    },
+
+    rhel81 = {
+      publisher = "RedHat"
+      offer     = "RHEL"
+      sku       = "8.1"
+      version   = "latest"
+    },
+
+    rhel81-gen2 = {
+      publisher = "RedHat"
+      offer     = "RHEL"
+      sku       = "81gen2"
+      version   = "latest"
+    },
+
+    rhel82 = {
+      publisher = "RedHat"
+      offer     = "RHEL"
+      sku       = "8.2"
+      version   = "latest"
+    },
+
+    rhel82-gen2 = {
+      publisher = "RedHat"
+      offer     = "RHEL"
+      sku       = "82gen2"
+      version   = "latest"
+    },
+
+    rhel83 = {
+      publisher = "RedHat"
+      offer     = "RHEL"
+      sku       = "8.3"
+      version   = "latest"
+    },
+
+    rhel83-gen2 = {
+      publisher = "RedHat"
+      offer     = "RHEL"
+      sku       = "83gen2"
+      version   = "latest"
+    },
+
+    rhel84 = {
+      publisher = "RedHat"
+      offer     = "RHEL"
+      sku       = "8.4"
+      version   = "latest"
+    },
+
+    rhel84-gen2 = {
+      publisher = "RedHat"
+      offer     = "RHEL"
+      sku       = "84gen2"
+      version   = "latest"
+    },
+
+    rhel84-byos = {
+      publisher = "RedHat"
+      offer     = "rhel-byos"
+      sku       = "rhel-lvm84"
+      version   = "latest"
+    },
+
+    rhel84-byos-gen2 = {
+      publisher = "RedHat"
+      offer     = "rhel-byos"
+      sku       = "rhel-lvm84-gen2"
       version   = "latest"
     },
 
@@ -316,6 +463,27 @@ variable "linux_distribution_list" {
       sku       = "sqldev"
       version   = "latest"
     },
+
+    mssql2019ent-ubuntu2004 = {
+      publisher = "MicrosoftSQLServer"
+      offer     = "sql2019-ubuntu2004"
+      sku       = "enterprise"
+      version   = "latest"
+    },
+
+    mssql2019std-ubuntu2004 = {
+      publisher = "MicrosoftSQLServer"
+      offer     = "sql2019-ubuntu2004"
+      sku       = "standard"
+      version   = "latest"
+    },
+
+    mssql2019dev-ubuntu2004 = {
+      publisher = "MicrosoftSQLServer"
+      offer     = "sql2019-ubuntu2004"
+      sku       = "sqldev"
+      version   = "latest"
+    },
   }
 }
 
@@ -352,6 +520,20 @@ variable "windows_distribution_list" {
       publisher = "MicrosoftWindowsServer"
       offer     = "WindowsServer"
       sku       = "2019-Datacenter"
+      version   = "latest"
+    },
+
+    windows2019dccore = {
+      publisher = "MicrosoftWindowsServer"
+      offer     = "WindowsServer"
+      sku       = "2019-Datacenter-Core"
+      version   = "latest"
+    },
+
+    windows2019dccore-g2 = {
+      publisher = "MicrosoftWindowsServer"
+      offer     = "WindowsServer"
+      sku       = "2019-datacenter-core-g2"
       version   = "latest"
     },
 
