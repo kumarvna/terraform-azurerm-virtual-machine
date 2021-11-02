@@ -35,8 +35,6 @@ module "virtual-machine" {
 
   # Network Seurity group port allow definitions for each Virtual Machine
   # NSG association to be added automatically for all network interfaces.
-  # SSH port 22 and 3389 is exposed to the Internet recommended for only testing. 
-  # For production environments, recommended to use a VPN or private connection.
   # Remove this NSG rules block, if `existing_network_security_group_id` is specified
   nsg_inbound_rules = [
     {
