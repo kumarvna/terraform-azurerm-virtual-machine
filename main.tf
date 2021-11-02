@@ -52,7 +52,7 @@ data "azurerm_storage_account" "storeacc" {
 }
 
 resource "random_password" "passwd" {
-  count       = var.disable_password_authentication != true || var.os_flavor == "windows" && var.admin_password == null ? 1 : 0
+  count       = var.admin_password == null ? 1 : 0
   length      = var.random_password_length
   min_upper   = 4
   min_lower   = 2
