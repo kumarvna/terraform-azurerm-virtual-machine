@@ -1,9 +1,8 @@
 # Azure Virtual Machines Terraform Module
 
-This terraform module is designed to deploy azure Windows or Linux virtual machines with Public IP, Availability Set and Network Security Group support.
+Terraform module to deploy azure Windows or Linux virtual machines with Public IP, proximity placement group, Availability Set, boot diagnostics, data disks, and Network Security Group support. It supports existing ssh keys or generates ssh key pairs if required for Linux VM's. It creates random passwords as well if you are not providing the custom password for Windows VM's.
 
-> **[NOTE]**
-> **This module now supports the meta arguments including `providers`, `depends_on`, `count`, and `for_each`.**
+This module supports to use existing NSG group. To enable this feature, specify the argument `existing_network_security_group_id` with a valid resource id of the current NSG group and remove all NSG inbound rules from the module.
 
 ## Resources Supported
 
@@ -11,15 +10,22 @@ This terraform module is designed to deploy azure Windows or Linux virtual machi
 * [Windows Virtual Machine](https://www.terraform.io/docs/providers/azurerm/r/windows_virtual_machine.html)
 * [Linux VM with SQL Server](https://docs.microsoft.com/en-us/azure/azure-sql/virtual-machines/linux/sql-vm-create-portal-quickstart)
 * [Windows VM with SQL Server](https://docs.microsoft.com/en-us/azure/azure-sql/virtual-machines/windows/sql-vm-create-portal-quickstart)
+* [Managed Data Disks](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/managed_disk)
+* [Boot Diagnostics](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/windows_virtual_machine#boot_diagnostics)
+* [Proximity Placement Group](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/proximity_placement_group)
+* [Availability Set](https://www.terraform.io/docs/providers/azurerm/r/availability_set.html)
 * [Public IP](https://www.terraform.io/docs/providers/azurerm/r/public_ip.html)
 * [Network Security Group](https://www.terraform.io/docs/providers/azurerm/r/network_security_group.html)
-* [Availability Set](https://www.terraform.io/docs/providers/azurerm/r/availability_set.html)
+* [Managed Identities](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/windows_virtual_machine#identity)
+* [Custom Data](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/windows_virtual_machine#custom_data)
+* [Additional_Unattend_Content](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/windows_virtual_machine#additional_unattend_content)
 * [SSH2 Key generation for Dev Environments](https://www.terraform.io/docs/providers/tls/r/private_key.html)
 * [Azure Monitoring Diagnostics](https://www.terraform.io/docs/providers/azurerm/r/monitor_diagnostic_setting.html)
+* [Log Analytics Agent Installation](https://docs.microsoft.com/en-us/azure/azure-monitor/agents/log-analytics-agent)
 
 ## Module Usage
 
-```hcl
+```terraform
 # Azurerm provider configuration
 provider "azurerm" {
   features {}
@@ -27,7 +33,7 @@ provider "azurerm" {
 
 module "virtual-machine" {
   source  = "kumarvna/virtual-machine/azurerm"
-  version = "2.2.0"
+  version = "2.3.0"
 
   # Resource Group, location, VNet and Subnet details
   resource_group_name  = "rg-shared-westeurope-01"
@@ -36,45 +42,34 @@ module "virtual-machine" {
   subnet_name          = "snet-management"
   virtual_machine_name = "vm-linux"
 
-  # (Optional) To enable Azure Monitoring and install log analytics agents
-  # (Optional) Specify `storage_account_name` to save monitoring logs to storage.   
-  log_analytics_workspace_name = var.log_analytics_workspace_name
-
-  # Deploy log analytics agents to virtual machine. Log analytics workspace name required.
-  # Defaults to `false` 
-  deploy_log_analytics_agent = false
-
   # This module support multiple Pre-Defined Linux and Windows Distributions.
-  # Linux images: ubuntu1804, ubuntu1604, centos75, centos77, centos81, coreos
-  # Windows Images: windows2012r2dc, windows2016dc, windows2019dc, windows2016dccore
-  # MSSQL 2017 images: mssql2017exp, mssql2017dev, mssql2017std, mssql2017ent
-  # MSSQL 2019 images: mssql2019dev, mssql2019std, mssql2019ent
-  # MSSQL 2019 Linux OS Images:
-  # RHEL8 images: mssql2019ent-rhel8, mssql2019std-rhel8, mssql2019dev-rhel8
-  # Ubuntu images: mssql2019ent-ubuntu1804, mssql2019std-ubuntu1804, mssql2019dev-ubuntu1804
-  # Bring your own License (BOYL) images: mssql2019ent-byol, mssql2019std-byol
-  os_flavor                  = "linux"
-  linux_distribution_name    = "ubuntu1804"
-  virtual_machine_size       = "Standard_A2_v2"
-  generate_admin_ssh_key     = false
-  admin_ssh_key_data         = "~/.ssh/id_rsa.pub"
-  instances_count            = 2
-  enable_vm_availability_set = true
+  # Check the README.md file for more pre-defined images for Ubuntu, Centos, RedHat.
+  # Please make sure to use gen2 images supported VM sizes if you use gen2 distributions
+  # Specify `disable_password_authentication = false` to create random admin password
+  # Specify a valid password with `admin_password` argument to use your own password 
+  # To generate SSH key pair, specify `generate_admin_ssh_key = true`
+  # To use existing key pair, specify `admin_ssh_key_data` to a valid SSH public key path.  
+  os_flavor               = "linux"
+  linux_distribution_name = "ubuntu2004"
+  virtual_machine_size    = "Standard_B2s"
+  generate_admin_ssh_key  = true
+  instances_count         = 2
 
-  # Add public IP to your VM
-  enable_public_ip_address = true
+  # Proxymity placement group, Availability Set and adding Public IP to VM's are optional.
+  # remove these argument from module if you dont want to use it.  
+  enable_proximity_placement_group = true
+  enable_vm_availability_set       = true
+  enable_public_ip_address         = true
 
   # Network Seurity group port allow definitions for each Virtual Machine
   # NSG association to be added automatically for all network interfaces.
-  # SSH port 22 and 3389 is exposed to the Internet recommended for only testing. 
-  # For production environments, recommended to use a VPN or private connection.
+  # Remove this NSG rules block, if `existing_network_security_group_id` is specified
   nsg_inbound_rules = [
     {
       name                   = "ssh"
       destination_port_range = "22"
       source_address_prefix  = "*"
     },
-
     {
       name                   = "http"
       destination_port_range = "80"
@@ -82,10 +77,37 @@ module "virtual-machine" {
     },
   ]
 
-  # Adding TAG's to your Azure resources (Required)
-  # ProjectName and Env are already declared above, to use them here, create a varible. 
+  # Boot diagnostics to troubleshoot virtual machines, by default uses managed 
+  # To use custom storage account, specify `storage_account_name` with a valid name
+  # Passing a `null` value will utilize a Managed Storage Account to store Boot Diagnostics
+  enable_boot_diagnostics = true
+
+  # Attach a managed data disk to a Windows/Linux VM's. Possible Storage account type are: 
+  # `Standard_LRS`, `StandardSSD_ZRS`, `Premium_LRS`, `Premium_ZRS`, `StandardSSD_LRS` or `UltraSSD_LRS`
+  # Initialize a new data disk - you need to connect to the VM and run diskmanagemnet or fdisk
+  data_disks = [
+    {
+      name                 = "disk1"
+      disk_size_gb         = 100
+      storage_account_type = "StandardSSD_LRS"
+    },
+    {
+      name                 = "disk2"
+      disk_size_gb         = 200
+      storage_account_type = "Standard_LRS"
+    }
+  ]
+
+  # (Optional) To enable Azure Monitoring and install log analytics agents
+  # (Optional) Specify `storage_account_name` to save monitoring logs to storage.   
+  log_analytics_workspace_name = var.log_analytics_workspace_name
+
+  # Deploy log analytics agents to virtual machine. Log analytics workspace name required.
+  deploy_log_analytics_agent = false
+
+  # Adding additional TAG's to your Azure resources
   tags = {
-    ProjectName  = "demo-internal"
+    ProjectName  = "demo-project"
     Env          = "dev"
     Owner        = "user@example.com"
     BusinessUnit = "CORP"
@@ -108,29 +130,30 @@ There are pre-defined Windows or Linux images available to deploy by setting up 
 
 OS type |Available Pre-defined Images|
 --------|----------------------------|
-Linux |`ubuntu1804`, `ubuntu1604`, `centos75`, `centos77`, `centos81`, `coreos`
-Windows|`windows2012r2dc`, `windows2016dc`, `windows2019dc`, `windows2016dccore`
+Linux |`ubuntu2004`, `ubuntu2004-gen2`, `ubuntu1904`, `ubuntu1804`, `ubuntu1604`, `centos75`, `centos77`, `centos78-gen2`, `centos79-gen2`, `centos81`, `centos81-gen2`, `centos82-gen2`, `centos83-gen2`, `centos84-gen2` `coreos`, `rhel78`, `rhel78-gen2`, `rhel79`, `rhel79-gen2`, `rhel81`, `rhel81-gen2`, `rhel82`, `rhel82-gen2`, `rhel83`, `rhel83-gen2`, `rhel84`, `rhel84-gen2`, `rhel84-byos`, `rhel84-byos-gen2`
+Windows|`windows2012r2dc`, `windows2016dc`, `windows2016dccore`, `windows2019dc`, `windows2019dccore`, `windows2019dccore-g2`, `windows2019dc-gensecond`, `windows2019dc-gs`, `windows2019dc-containers`, `windows2019dc-containers-g2`
 MS SQL 2017|`mssql2017exp`, `mssql2017dev`, `mssql2017std`, `mssql2017ent`
 MS SQL 2019|`mssql2019dev`, `mssql2019std`, `mssql2019ent`
 MS SQL 2019 Linux (RHEL8)|`mssql2019ent-rhel8`, `mssql2019std-rhel8`, `mssql2019dev-rhel8`
-MS SQL 2019 Linux (Ubuntu)|`mssql2019ent-ubuntu1804`, `mssql2019std-ubuntu1804`, `mssql2019dev-ubuntu1804`
+MS SQL 2019 Linux (Ubuntu)|`mssql2019ent-ubuntu1804`, `mssql2019std-ubuntu1804`, `mssql2019dev-ubuntu1804`, `mssql2019ent-ubuntu2004`, `mssql2019std-ubuntu2004`, `mssql2019dev-ubuntu2004`
 MS SQL 2019 Bring your own License (BOYL)|`mssql2019ent-byol`, `mssql2019std-byol`
 
 ## Custom Virtual Machine images
 
 If the pre-defined Windows or Linux variants are not sufficient then, you can specify the custom image by setting up the argument `custom_image` with appropriate values. Custom images can be used to bootstrap configurations such as preloading applications, application configurations, and other OS configurations. For more information [check here](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/tutorial-custom-images)
 
-```hcl
+```terraform
 module "virtual-machine" {
   source  = "kumarvna/virtual-machine/azurerm"
-  version = "2.2.0"
+  version = "2.3.0"
 
   # .... omitted
-
-  os_flavor                  = "linux"
-  instances_count            = 2
-  enable_vm_availability_set = true
-  enable_public_ip_address   = true
+  
+  os_flavor               = "linux"
+  linux_distribution_name = "ubuntu2004"
+  virtual_machine_size    = "Standard_B2s"
+  generate_admin_ssh_key  = true
+  instances_count         = 2
 
   custom_image = {
       publisher = "myPublisher"
@@ -140,6 +163,8 @@ module "virtual-machine" {
     }
 
   # .... omitted
+
+}
 ```
 
 ## Custom DNS servers
@@ -178,7 +203,17 @@ By default this not enabled and set to disable. To enable the static private IP 
 
 Azure Dedicated Host is a service that provides physical servers - able to host one or more virtual machines - dedicated to one Azure subscription. Dedicated hosts are the same physical servers used in our data centers, provided as a resource. You can provision dedicated hosts within a region, availability zone, and fault domain. Virtual machine scale sets are not currently supported on dedicated hosts.
 
-By default, this not enabled and set to disable. To add a dedicated host to Virtual machine using this module, set the argument `dedicated_host_id` with valid dedicated host resource ID. It is possible to add Dedicated Host resource outside this module.  
+By default, this not enabled and set to disable. To add a dedicated host to Virtual machine using this module, set the argument `dedicated_host_id` with valid dedicated host resource ID. It is possible to add Dedicated Host resource outside this module.
+
+### `enable_proximity_placement_group` -  Achieving the lowest possible latency
+
+Placing VMs in a single region reduces the physical distance between the instances. Placing them within a single availability zone will also bring them physically closer together. However, as the Azure footprint grows, a single availability zone may span multiple physical data centers, which may result in a network latency impacting your application.
+
+To get VMs as close as possible, achieving the lowest possible latency, you should deploy them within a proximity placement group.
+
+A proximity placement group is a logical grouping used to make sure that Azure compute resources are physically located close to each other. Proximity placement groups are useful for workloads where low latency is a requirement.
+
+By default, this not enabled and set to disable. To enable the Proximity placement group with this module, set the argument `enable_proximity_placement_group = true`.
 
 ### `enable_vm_availability_set` - Create highly available virtual machines
 
@@ -212,18 +247,18 @@ In the Source and Destination columns, `VirtualNetwork`, `AzureLoadBalancer`, an
 
 *You cannot remove the default rules, but you can override them by creating rules with higher priorities.*
 
-```hcl
+```terraform
 module "virtual-machine" {
   source  = "kumarvna/virtual-machine/azurerm"
-  version = "2.2.0"
+  version = "2.3.0"
 
   # .... omitted
   
-  os_flavor                  = "linux"
-  linux_distribution_name    = "ubuntu1804"
-  virtual_machine_size       = "Standard_A2_v2"  
-  generate_admin_ssh_key     = false
-  admin_ssh_key_data         = "./id_rsa.pub"
+  os_flavor               = "linux"
+  linux_distribution_name = "ubuntu2004"
+  virtual_machine_size    = "Standard_B2s"
+  generate_admin_ssh_key  = true
+  instances_count         = 2
 
   nsg_inbound_rules = [
     {
@@ -238,6 +273,41 @@ module "virtual-machine" {
       source_address_prefix  = "*"
     },
   ]
+
+  # .... omitted
+
+}
+```
+
+### Using exisging Network Security Groups
+
+Enterprise environment may need a requirement to use pre existed NSG groups to maintain capabilites. This module supports existing network security groups usage. To use this feature, set the argument `existing_network_security_group_id` with a valid NSG resoruce id and remove all NSG inbound rules blocks from the module.
+
+```terraform
+data "azurerm_network_security_group" "example" {
+  name                = "nsg_mgnt_subnet_in"
+  resource_group_name = "vnet-shared-hub-westeurope-001"
+}
+
+module "virtual-machine" {
+  source  = "kumarvna/virtual-machine/azurerm"
+  version = "2.3.0"
+
+  # .... omitted
+  
+  os_flavor               = "linux"
+  linux_distribution_name = "ubuntu2004"
+  virtual_machine_size    = "Standard_B2s"
+  generate_admin_ssh_key  = true
+  instances_count         = 2
+
+  # Network Seurity group port allow definitions for each Virtual Machine
+  # NSG association to be added automatically for all network interfaces.
+  # Remove this NSG rules block, if `existing_network_security_group_id` is specified
+  existing_network_security_group_id = data.azurerm_network_security_group.example.id
+
+  # .... omitted
+
 }
 ```
 

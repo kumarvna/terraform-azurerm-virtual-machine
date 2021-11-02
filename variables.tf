@@ -247,7 +247,21 @@ variable "linux_distribution_list" {
       version   = "latest"
     },
 
+    ubuntu1904 = {
+      publisher = "Canonical"
+      offer     = "UbuntuServer"
+      sku       = "19.04"
+      version   = "latest"
+    },
+
     ubuntu2004 = {
+      publisher = "Canonical"
+      offer     = "0001-com-ubuntu-server-focal-daily"
+      sku       = "20_04-daily-lts"
+      version   = "latest"
+    },
+
+    ubuntu2004-gen2 = {
       publisher = "Canonical"
       offer     = "0001-com-ubuntu-server-focal-daily"
       sku       = "20_04-daily-lts-gen2"
@@ -513,6 +527,34 @@ variable "windows_distribution_list" {
       publisher = "MicrosoftWindowsServer"
       offer     = "WindowsServer"
       sku       = "2019-Datacenter"
+      version   = "latest"
+    },
+
+    windows2019dc-gensecond = {
+      publisher = "MicrosoftWindowsServer"
+      offer     = "WindowsServer"
+      sku       = "2019-datacenter-gensecond"
+      version   = "latest"
+    },
+
+    windows2019dc-gs = {
+      publisher = "MicrosoftWindowsServer"
+      offer     = "WindowsServer"
+      sku       = "2019-datacenter-gs"
+      version   = "latest"
+    },
+
+    windows2019dc-containers = {
+      publisher = "MicrosoftWindowsServer"
+      offer     = "WindowsServer"
+      sku       = "2019-Datacenter-with-Containers"
+      version   = "latest"
+    },
+
+    windows2019dc-containers-g2 = {
+      publisher = "MicrosoftWindowsServer"
+      offer     = "WindowsServer"
+      sku       = "2019-datacenter-with-containers-g2"
       version   = "latest"
     },
 

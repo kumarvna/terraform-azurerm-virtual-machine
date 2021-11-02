@@ -62,7 +62,8 @@ module "virtual-machine" {
   # Passing a `null` value will utilize a Managed Storage Account to store Boot Diagnostics
   enable_boot_diagnostics = true
 
-  # Attach a managed data disk to a Windows/Linux VM's 
+  # Attach a managed data disk to a Windows/Linux VM's. Possible Storage account type are: 
+  # `Standard_LRS`, `StandardSSD_ZRS`, `Premium_LRS`, `Premium_ZRS`, `StandardSSD_LRS` or `UltraSSD_LRS`
   # Initialize a new data disk - you need to connect to the VM and run diskmanagemnet or fdisk
   data_disks = [
     {
