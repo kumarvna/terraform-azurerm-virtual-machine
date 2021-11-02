@@ -18,16 +18,6 @@ variable "subnet_name" {
   default     = ""
 }
 
-variable "log_analytics_workspace_name" {
-  description = "The name of log analytics workspace name"
-  default     = null
-}
-
-variable "storage_account_name" {
-  description = "The name of the hub storage account to store logs"
-  default     = null
-}
-
 variable "random_password_length" {
   description = "The desired length of random password created by this module"
   default     = 24
@@ -670,7 +660,7 @@ variable "disk_size_gb" {
 }
 
 variable "enable_os_disk_write_accelerator" {
-  description = "hould Write Accelerator be Enabled for this OS Disk? This requires that the `storage_account_type` is set to `Premium_LRS` and that `caching` is set to `None`."
+  description = "Should Write Accelerator be Enabled for this OS Disk? This requires that the `storage_account_type` is set to `Premium_LRS` and that `caching` is set to `None`."
   default     = false
 }
 
@@ -700,7 +690,7 @@ variable "winrm_protocol" {
 }
 
 variable "key_vault_certificate_secret_url" {
-  description = "he Secret URL of a Key Vault Certificate, which must be specified when `protocol` is set to `Https`"
+  description = "The Secret URL of a Key Vault Certificate, which must be specified when `protocol` is set to `Https`"
   default     = null
 }
 
@@ -725,7 +715,7 @@ variable "storage_account_uri" {
 }
 
 variable "data_disks" {
-  description = "Data Disks for azure viratual machine"
+  description = "Managed Data Disks for azure viratual machine"
   type = list(object({
     name                 = string
     storage_account_type = string
@@ -737,6 +727,16 @@ variable "data_disks" {
 variable "nsg_diag_logs" {
   description = "NSG Monitoring Category details for Azure Diagnostic setting"
   default     = ["NetworkSecurityGroupEvent", "NetworkSecurityGroupRuleCounter"]
+}
+
+variable "log_analytics_workspace_name" {
+  description = "The name of log analytics workspace name"
+  default     = null
+}
+
+variable "storage_account_name" {
+  description = "The name of the hub storage account to store logs"
+  default     = null
 }
 
 variable "deploy_log_analytics_agent" {
