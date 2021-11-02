@@ -15,6 +15,12 @@ output "windows_vm_password" {
   value       = module.virtual-machine.windows_vm_password
 }
 
+output "linux_vm_password" {
+  description = "Password for the Linux VM"
+  sensitive   = true
+  value       = module.virtual-machine.linux_vm_password
+}
+
 output "windows_vm_public_ips" {
   description = "Public IP's map for the all windows Virtual Machines"
   value       = module.virtual-machine.windows_vm_public_ips
