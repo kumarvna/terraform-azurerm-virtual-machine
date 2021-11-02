@@ -1,18 +1,24 @@
 output "admin_ssh_key_public" {
   description = "The generated public key data in PEM format"
-  value       = var.generate_admin_ssh_key == true && var.os_flavor == "linux" ? tls_private_key.rsa[0].public_key_openssh : null
+  value       = var.disable_password_authentication == true && var.generate_admin_ssh_key == true && var.os_flavor == "linux" ? tls_private_key.rsa[0].public_key_openssh : null
 }
 
 output "admin_ssh_key_private" {
   description = "The generated private key data in PEM format"
   sensitive   = true
-  value       = var.generate_admin_ssh_key == true && var.os_flavor == "linux" ? tls_private_key.rsa[0].private_key_pem : null
+  value       = var.disable_password_authentication == true && var.generate_admin_ssh_key == true && var.os_flavor == "linux" ? tls_private_key.rsa[0].private_key_pem : null
 }
 
 output "windows_vm_password" {
   description = "Password for the windows VM"
   sensitive   = true
   value       = var.os_flavor == "windows" ? element(concat(random_password.passwd.*.result, [""]), 0) : null
+}
+
+output "linux_vm_password" {
+  description = "Password for the Linux VM"
+  sensitive   = true
+  value       = var.os_flavor == "linux" && var.disable_password_authentication != true && var.admin_password == null ? element(concat(random_password.passwd.*.result, [""]), 0) : null
 }
 
 output "windows_vm_public_ips" {
@@ -47,7 +53,7 @@ output "windows_virtual_machine_ids" {
 
 output "network_security_group_ids" {
   description = "List of Network security groups and ids"
-  value       = azurerm_network_security_group.nsg.id
+  value       = azurerm_network_security_group.nsg.*.id
 }
 
 output "vm_availability_set_id" {
