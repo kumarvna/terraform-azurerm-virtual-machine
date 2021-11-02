@@ -5,7 +5,7 @@ provider "azurerm" {
 
 data "azurerm_network_security_group" "example" {
   name                = "nsg_mgnt_subnet_in"
-  resource_group_name = "vnet-shared-hub-westeurope-001"
+  resource_group_name = "rg-shared-westeurope-01"
 }
 
 data "azurerm_log_analytics_workspace" "example" {
