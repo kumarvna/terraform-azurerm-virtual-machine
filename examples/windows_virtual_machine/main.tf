@@ -41,7 +41,6 @@ module "virtual-machine" {
       destination_port_range = "3389"
       source_address_prefix  = "*"
     },
-
     {
       name                   = "http"
       destination_port_range = "80"

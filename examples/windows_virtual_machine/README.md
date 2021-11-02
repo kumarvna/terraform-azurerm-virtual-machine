@@ -1,6 +1,6 @@
 # Azure Windows virtual Machine Terraform Module
 
-This terraform module is designed to deploy azure Windows virtual machineswith Public IP, proximity placement group, Availability Set, boot diagnostics, data disks, and Network Security Group support. It also creates random password if you are not providing the custom password.
+This terraform module is designed to deploy azure Windows virtual machines with Public IP, proximity placement group, Availability Set, boot diagnostics, data disks, and Network Security Group support. It also creates random password if you are not providing the custom password.
 
 This module supports to use existing NSG group. To enable this feature, specify the argument `existing_network_security_group_id` with a valid resource id of the current NSG group and remove all NSG inbound rules from the module.
 
@@ -50,7 +50,6 @@ module "virtual-machine" {
       destination_port_range = "3389"
       source_address_prefix  = "*"
     },
-
     {
       name                   = "http"
       destination_port_range = "80"

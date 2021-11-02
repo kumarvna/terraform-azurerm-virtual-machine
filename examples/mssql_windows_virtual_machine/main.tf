@@ -5,8 +5,7 @@ provider "azurerm" {
 
 module "virtual-machine" {
   source  = "kumarvna/virtual-machine/azurerm"
-  version = "2.2.0"
-
+  version = "2.3.0"
 
   # Resource Group, location, VNet and Subnet details
   resource_group_name  = "rg-shared-westeurope-01"
@@ -15,56 +14,71 @@ module "virtual-machine" {
   subnet_name          = "snet-management"
   virtual_machine_name = "win-sqlvm"
 
-  # (Optional) To enable Azure Monitoring and install log analytics agents
-  # (Optional) Specify `storage_account_name` to save monitoring logs to storage.   
-  log_analytics_workspace_name = var.log_analytics_workspace_name
-
-  # Deploy log analytics agents to virtual machine. Log analytics workspace name required.
-  # Defaults to `false` 
-  deploy_log_analytics_agent = false
-
   # This module support multiple Pre-Defined Linux and Windows Distributions.
-  # Linux images: ubuntu1804, ubuntu1604, centos75, centos77, centos81, coreos
-  # Windows Images: windows2012r2dc, windows2016dc, windows2019dc, windows2016dccore
-  # MSSQL 2017 images: mssql2017exp, mssql2017dev, mssql2017std, mssql2017ent
-  # MSSQL 2019 images: mssql2019dev, mssql2019std, mssql2019ent
-  # MSSQL 2019 Linux OS Images:
-  # RHEL8 images: mssql2019ent-rhel8, mssql2019std-rhel8, mssql2019dev-rhel8
-  # Ubuntu images: mssql2019ent-ubuntu1804, mssql2019std-ubuntu1804, mssql2019dev-ubuntu1804
-  # Bring your own License (BOYL) images: mssql2019ent-byol, mssql2019std-byol
-  os_flavor                  = "windows"
-  windows_distribution_name  = "mssql2019std"
-  virtual_machine_size       = "Standard_A2_v2"
-  admin_username             = "azureadmin"
-  admin_password             = "P@$$w0rd1234!"
-  instances_count            = 2
-  enable_vm_availability_set = true
+  # Check the README.md file for more pre-defined images for WindowsServer, MSSQLServer.
+  # Please make sure to use gen2 images supported VM sizes if you use gen2 distributions
+  # This module creates a random admin password if `admin_password` is not specified
+  # Specify a valid password with `admin_password` argument to use your own password 
+  os_flavor                 = "windows"
+  windows_distribution_name = "mssql2019std"
+  virtual_machine_size      = "Standard_A2_v2"
+  admin_username            = "azureadmin"
+  admin_password            = "P@$$w0rd1234!"
+  instances_count           = 2
 
-  # Add public IP to your VM
-  enable_public_ip_address = true
+  # Proxymity placement group, Availability Set and adding Public IP to VM's are optional.
+  # remove these argument from module if you dont want to use it.  
+  enable_proximity_placement_group = true
+  enable_vm_availability_set       = true
+  enable_public_ip_address         = true
 
   # Network Seurity group port allow definitions for each Virtual Machine
   # NSG association to be added automatically for all network interfaces.
-  # SSH port 22 and 3389 is exposed to the Internet recommended for only testing. 
-  # For production environments, recommended to use a VPN or private connection.
+  # Remove this NSG rules block, if `existing_network_security_group_id` is specified
   nsg_inbound_rules = [
     {
       name                   = "rdp"
       destination_port_range = "3389"
       source_address_prefix  = "*"
     },
-
     {
-      name                   = "dbport"
-      destination_port_range = "1443"
+      name                   = "http"
+      destination_port_range = "80"
       source_address_prefix  = "*"
     },
   ]
 
-  # Adding TAG's to your Azure resources (Required)
-  # ProjectName and Env are already declared above, to use them here, create a varible. 
+  # Boot diagnostics to troubleshoot virtual machines, by default uses managed 
+  # To use custom storage account, specify `storage_account_name` with a valid name
+  # Passing a `null` value will utilize a Managed Storage Account to store Boot Diagnostics
+  enable_boot_diagnostics = true
+
+  # Attach a managed data disk to a Windows/Linux VM's 
+  # Initialize a new data disk - you need to connect to the VM and run diskmanagemnet or fdisk
+
+  data_disks = [
+    {
+      name                 = "disk1"
+      disk_size_gb         = 100
+      storage_account_type = "StandardSSD_LRS"
+    },
+    {
+      name                 = "disk2"
+      disk_size_gb         = 200
+      storage_account_type = "Standard_LRS"
+    }
+  ]
+
+  # (Optional) To enable Azure Monitoring and install log analytics agents
+  # (Optional) Specify `storage_account_name` to save monitoring logs to storage.   
+  log_analytics_workspace_name = var.log_analytics_workspace_name
+
+  # Deploy log analytics agents to virtual machine. Log analytics workspace name required.
+  deploy_log_analytics_agent = false
+
+  # Adding additional TAG's to your Azure resources
   tags = {
-    ProjectName  = "demo-internal"
+    ProjectName  = "demo-project"
     Env          = "dev"
     Owner        = "user@example.com"
     BusinessUnit = "CORP"
