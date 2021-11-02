@@ -83,8 +83,8 @@ module "virtual-machine" {
   enable_boot_diagnostics = true
 
   # Attach a managed data disk to a Windows/Linux VM's. Possible Storage account type are: 
-  # `Standard_LRS`, `StandardSSD_ZRS`, `Premium_LRS`, `Premium_ZRS`, 
-  # `StandardSSD_LRS` or `UltraSSD_LRS`
+  # `Standard_LRS`, `StandardSSD_ZRS`, `Premium_LRS`, `Premium_ZRS`, `StandardSSD_LRS`
+  # or `UltraSSD_LRS` (UltraSSD_LRS only available in a region that support availability zones)
   # Initialize a new data disk - you need to connect to the VM and run diskmanagemnet or fdisk
   data_disks = [
     {
@@ -323,7 +323,7 @@ module "virtual-machine" {
 
 ## Using exisging Network Security Groups
 
-Enterprise environment may need a requirement to use pre existed NSG groups to maintain capabilites. This module supports existing network security groups usage. To use this feature, set the argument `existing_network_security_group_id` with a valid NSG resoruce id and remove all NSG inbound rules blocks from the module.
+Enterprise environments may need a requirement to use pre-existing NSG groups to maintain capabilities. This module supports existing network security groups usage. To use this feature, set the argument `existing_network_security_group_id` with a valid NSG resource id and remove all NSG inbound rules blocks from the module.
 
 ```terraform
 data "azurerm_network_security_group" "example" {
@@ -375,8 +375,8 @@ An effective naming convention assembles resource names by using important resou
 | Name | Version |
 |------|---------|
 | azurerm | >= 2.59.0 |
-| random | n/a |
-| tls | n/a |
+| random | >= 3.1.0 |
+| tls | >= 3.1.0 |
 
 ## Inputs
 
@@ -386,39 +386,63 @@ Name | Description | Type | Default
 `location`|The location of the resource group in which resources are created|string | `""`
 `virtual_network_name`|The name of the virtual network|string |`""`
 `subnet_name`|The name of the subnet to use in VM scale set|string |`""`
-`virtual_machine_name`|The name of the virtual machine|string | `""`
-`os_flavor`|Specify the flavor of the operating system image to deploy Virtual Machine. Possible values are `windows` and `linux`|string |`"windows"`
-`virtual_machine_size`|The Virtual Machine SKU for the Virtual Machine|string|`"Standard_A2_v2"`
-`instances_count`|The number of Virtual Machines required|number|`1`
+`random_password_length`|The desired length of random password created by this module|number|`24`
+`enable_public_ip_address`|Reference to a Public IP Address to associate with the NIC|string|`false`
+`public_ip_allocation_method`|Defines the allocation method for this IP address. Possible values are `Static` or `Dynamic`|string|`Static`
+`public_ip_sku`|The SKU of the Public IP. Accepted values are `Basic` and `Standard`|string|`Standard`
+`domain_name_label`|Label for the Domain Name. Will be used to make up the FQDN. If a domain name label is specified, an A DNS record is created for the public IP in the Microsoft Azure DNS system|string|`null`
+`public_ip_availability_zone`|The availability zone to allocate the Public IP in. Possible values are `Zone-Redundant`, `1`,`2`, `3`, and `No-Zone`|string|`"Zone-Redundant"`
+`public_ip_sku_tier`|The SKU Tier that should be used for the Public IP. Possible values are `Regional` and `Global`|string|`"Regional"`
+`dns_servers`|List of dns servers to use for network interface|string|`[]`
 `enable_ip_forwarding`|Should IP Forwarding be enabled?|string|`false`
 `enable_accelerated_networking`|Should Accelerated Networking be enabled?|string|`false`
 `private_ip_address_allocation_type`|The allocation method used for the Private IP Address. Possible values are Dynamic and Static.|string|`false`
 `private_ip_address`|The Static IP Address which should be used. This is valid only when `private_ip_address_allocation` is set to `Static`.|string|`null`
-`dns_servers`|List of dns servers to use for network interface|string|`[]`
 `enable_vm_availability_set`|Manages an Availability Set for Virtual Machines.|string|`false`
 `platform_fault_domain_count`|Specifies the number of fault domains that are used|number|`3`
 `platform_update_domain_count`|Specifies the number of update domains that are used|number|`5`
-`enable_public_ip_address`|Reference to a Public IP Address to associate with the NIC|string|`false`
-`public_ip_allocation_method`|Defines the allocation method for this IP address. Possible values are `Static` or `Dynamic`|string|`Static`
-`public_ip_sku`|The SKU of the Public IP. Accepted values are `Basic` and `Standard`|string|`Standard`
-`source_image_id`|The ID of an Image which each Virtual Machine should be based on|string|`null`
-`custom_image`|Provide the custom image to this module if the default variants are not sufficient|map(object)|`null`
-`linux_distribution_list`|Pre-defined Azure Linux VM images list|map(object)|`ubuntu1804`
-`linux_distribution_name`|Variable to pick an OS flavor for Linux based Virtual Machine. Possible values are `centos81`, `centos77`, `centos77`, `ubuntu1804`, `ubuntu1604`, `coreos`, `mssql2019ent-rhel8`, `mssql2019std-rhel8`, `mssql2019dev-rhel8`, `mssql2019ent-ubuntu1804`, `mssql2019std-ubuntu1804`, `mssql2019dev-ubuntu1804`|string|`ubuntu1804`
-`windows_distribution_list`|Pre-defined Azure Windows VM images list|map(object)|`"windows2019dc"`
-`windows_distribution_name`|Variable to pick an OS flavor for Windows based VM. Possible values are `windows2012r2dc`, `windows2016dc`, `windows2019dc`, `windows2016dccore`, `mssql2017exp`, `mssql2017dev`, `mssql2017std`, `mssql2017ent`, `mssql2019dev`, `mssql2019std`, `mssql2019ent`, `mssql2019ent-byol`, `mssql2019std-byol`|string|`"windows2019dc"`
-`os_disk_storage_account_type`|The Type of Storage Account for Internal OS Disk. Possible values include Standard_LRS, StandardSSD_LRS and Premium_LRS.|string|`"StandardSSD_LRS"`
-`enable_ultra_ssd_data_disk_storage_support`|Should the capacity to enable Data Disks of the UltraSSD_LRS storage account type be supported on this Virtual Machine|string|`false`
-`generate_admin_ssh_key`|Generates a secure private key and encodes it as PEM|string|`true`
-`admin_ssh_key_data`|specify the path to the existing SSH key to authenticate Linux virtual machine|string|`""`
+`enable_proximity_placement_group`|Manages a proximity placement group for virtual machines, virtual machine scale sets and availability sets|string|`false`
+`existing_network_security_group_id`|The resource id of existing network security group|string|`null`
+`nsg_inbound_rules`|List of network rules to apply to network interface|object|`{}`
+`virtual_machine_name`|The name of the virtual machine|string | `""`
+`instances_count`|The number of Virtual Machines required|number|`1`
+`os_flavor`|Specify the flavor of the operating system image to deploy Virtual Machine. Possible values are `windows` and `linux`|string |`"windows"`
+`virtual_machine_size`|The Virtual Machine SKU for the Virtual Machine|string|`"Standard_A2_v2"`
+`disable_password_authentication`|Should Password Authentication be disabled on this Virtual Machine. Applicable to Linux Virtual machine|string|`true`
 `admin_username`|The username of the local administrator used for the Virtual Machine|string|`"azureadmin"`
 `admin_password`|The Password which should be used for the local-administrator on this Virtual Machine|string|`null`
-`random_password_length`|The desired length of random password created by this module|number|`24`
-`disable_password_authentication`|Should Password Authentication be disabled on this Virtual Machine. Applicable to Linux Virtual machine|string|`true`
-`nsg_inbound_rules`|List of network rules to apply to network interface|object|`{}`
+`source_image_id`|The ID of an Image which each Virtual Machine should be based on|string|`null`
 `dedicated_host_id`|The ID of a Dedicated Host where this machine should be run on|string|`null`
+`custom_data`|Base64 encoded file of a bash script that gets run once by cloud-init upon VM creation|string|`null`
+`enable_automatic_updates`|Specifies if Automatic Updates are Enabled for the Windows Virtual Machine|string|`false`
+`enable_encryption_at_host`|Should all of the disks (including the temp disk) attached to this Virtual Machine be encrypted by enabling Encryption at Host?|string|false
+`vm_availability_zone`|The Zone in which this Virtual Machine should be created. Conflicts with availability set and shouldn't use both.|string|`null`
+`patch_mode`|Specifies the mode of in-guest patching to this Windows Virtual Machine. Possible values are `Manual`, `AutomaticByOS` and `AutomaticByPlatform`|string|`"AutomaticByOS"`
 `license_type`|Specifies the type of on-premise license which should be used for this Virtual Machine. Possible values are `None`, `Windows_Client` and `Windows_Server`.|string|`"None"`
 `vm_time_zone`|Specifies the Time Zone which should be used by the Virtual Machine. Ex. `"UTC"` or `"W. Europe Standard Time"` [The possible values are defined here](https://jackstromberg.com/2017/01/list-of-time-zones-consumed-by-azure/) |string|`null`
+`generate_admin_ssh_key`|Generates a secure private key and encodes it as PEM|string|`true`
+`admin_ssh_key_data`|specify the path to the existing SSH key to authenticate Linux virtual machine|string|`""`
+`custom_image`|Provide the custom image to this module if the default variants are not sufficient|map(object)|`null`
+`linux_distribution_list`|Pre-defined Azure Linux VM images list|map(object)|`ubuntu1804`
+`linux_distribution_name`|Variable to pick an OS flavor for Linux based Virtual Machine. Possible values are `ubuntu2004`, `ubuntu2004-gen2`, `ubuntu1904`, `ubuntu1804`, `ubuntu1604`, `centos75`, `centos77`, `centos78-gen2`, `centos79-gen2`, `centos81`, `centos81-gen2`, `centos82-gen2`, `centos83-gen2`, `centos84-gen2` `coreos`, `rhel78`, `rhel78-gen2`, `rhel79`, `rhel79-gen2`, `rhel81`, `rhel81-gen2`, `rhel82`, `rhel82-gen2`, `rhel83`, `rhel83-gen2`, `rhel84`, `rhel84-gen2`, `rhel84-byos`, `rhel84-byos-gen2`, `mssql2019ent-rhel8`, `mssql2019std-rhel8`, `mssql2019dev-rhel8`, `mssql2019ent-ubuntu1804`, `mssql2019std-ubuntu1804`, `mssql2019dev-ubuntu1804`, `mssql2019ent-ubuntu2004`, `mssql2019std-ubuntu2004`, `mssql2019dev-ubuntu2004`|string|`ubuntu1804`
+`windows_distribution_list`|Pre-defined Azure Windows VM images list|map(object)|`"windows2019dc"`
+`windows_distribution_name`|Variable to pick an OS flavor for Windows based VM. Possible values are `windows2012r2dc`, `windows2016dc`, `windows2016dccore`, `windows2019dc`, `windows2019dccore`, `windows2019dccore-g2`, `windows2019dc-gensecond`, `windows2019dc-gs`, `windows2019dc-containers`, `windows2019dc-containers-g2`, `mssql2017exp`, `mssql2017dev`, `mssql2017std`, `mssql2017ent`, `mssql2019dev`, `mssql2019std`, `mssql2019ent`, `mssql2019ent-byol`, `mssql2019std-byol`|string|`"windows2019dc"`
+`os_disk_storage_account_type`|The Type of Storage Account for Internal OS Disk. Possible values include Standard_LRS, StandardSSD_LRS and Premium_LRS.|string|`"StandardSSD_LRS"`
+`os_disk_caching`|The Type of Caching which should be used for the Internal OS Disk. Possible values are `None`, `ReadOnly` and `ReadWrite`|string|`"ReadWrite"`
+`disk_encryption_set_id`|The ID of the Disk Encryption Set which should be used to Encrypt this OS Disk. The Disk Encryption Set must have the `Reader` Role Assignment scoped on the Key Vault - in addition to an Access Policy to the Key Vault|string|`null`
+`disk_size_gb`|The Size of the Internal OS Disk in GB, if you wish to vary from the size used in the image this Virtual Machine is sourced from|number|`null`
+`enable_os_disk_write_accelerator`|Should Write Accelerator be Enabled for this OS Disk? This requires that the `storage_account_type` is set to `Premium_LRS` and that `caching` is set to `None`|string|`false`
+`os_disk_name`|The name which should be used for the Internal OS Disk|string|`null`
+`enable_ultra_ssd_data_disk_storage_support`|Should the capacity to enable Data Disks of the UltraSSD_LRS storage account type be supported on this Virtual Machine|string|`false`
+`managed_identity_type`|The type of Managed Identity which should be assigned to the Linux Virtual Machine. Possible values are `SystemAssigned`, `UserAssigned` and `SystemAssigned, UserAssigned`|string|`null`
+`managed_identity_ids`|A list of User Managed Identity ID's which should be assigned to the Linux Virtual Machine.|string|`null`
+`winrm_protocol`|Specifies the protocol of winrm listener. Possible values are `Http` or `Https`|string|`null`
+`key_vault_certificate_secret_url`|The Secret URL of a Key Vault Certificate, which must be specified when `protocol` is set to `Https`|string|`null`
+`additional_unattend_content`|The XML formatted content that is added to the unattend.xml file for the specified path and component|string|`null`
+`additional_unattend_content_setting`|The name of the setting to which the content applies. Possible values are `AutoLogon` and `FirstLogonCommands`|string|`null`
+`enable_boot_diagnostics`|Should the boot diagnostics enabled?|string|false
+`storage_account_uri`|The Primary/Secondary Endpoint for the Azure Storage Account which should be used to store Boot Diagnostics, including Console Output and Screenshots from the Hypervisor. Passing a `null` value will utilize a Managed Storage Account to store Boot Diagnostics|string|`null`
+`data_disks`|Managed Data Disks for azure viratual machine|list|`[]`
 `log_analytics_workspace_name`|The name of log analytics workspace name|string|`null`
 `storage_account_name`|The name of the storage account name|string|`null`
 `deploy_log_analytics_agent`|Install log analytics agent to windows or linux VM|string|`false`
@@ -430,7 +454,8 @@ Name | Description | Type | Default
 |---- | -----------|
 `admin_ssh_key_public`|The generated public key data in PEM format
 `admin_ssh_key_private`|The generated private key data in PEM format
-`windows_vm_password`|Password for the windows Virtual Machine
+`windows_vm_password`|Password for the Windows Virtual Machine
+`linux_vm_password`|Password for the Linux Virtual Machine
 `windows_vm_public_ips`|Public IP's map for the all windows Virtual Machines
 `linux_vm_public_ips`|Public IP's map for the all windows Virtual Machines
 `windows_vm_private_ips`|Public IP's map for the all windows Virtual Machines
