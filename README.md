@@ -240,7 +240,7 @@ Azure managed disks are block-level storage volumes that are managed by Azure an
 
 By default, this module uses the standard SSD with Locally redundant storage (`StandardSSD_LRS`). To use other type of disks, set the argument `os_disk_storage_account_type` with valid values. Possible values are `Standard_LRS`, `StandardSSD_LRS` and `Premium_LRS`.
 
-### Identity - Configure managed identities for Azure resources on a VM
+### `Identity` - Configure managed identities for Azure resources on a VM
 
 Managed identities for Azure resources provides Azure services with an automatically managed identity in Azure Active Directory. You can use this identity to authenticate to any service that supports Azure AD authentication, without having credentials in your code.
 
@@ -280,6 +280,16 @@ module "virtual-machine" {
 
 }
 ```
+
+### `enable_boot_diagnostics` - boot diagnostics to troubleshoot virtual machines
+
+Boot diagnostics is a debugging feature for Azure virtual machines (VM) that allows the diagnosis of VM boot failures. Boot diagnostics enables a user to observe the state of their VM as it is booting up by collecting serial log information and screenshots. This module enabled this feature by setting up `enable_boot_diagnostics = true`. Azure Storage Account to be used to store Boot Diagnostics, including Console Output and Screenshots from the Hypervisor. This module supports the existing storage account using the `storage_account_name` argument with a valid name. If we are not passing any storage account, it will utilize a Managed Storage Account to store Boot Diagnostics.
+
+### `winrm_protocol` - Enable WinRM wiht HTTPS
+
+Window remote management - in short, `WinRM` is a built-in windows protocol/Service which uses soap[simple object access protocol] to connect from another source system. Using WinRM, we can connect the remote system and execute any command there as its native user.
+
+WinRM comes pre-installed with all new window OS. We need to enable WinRM service and configure the ports for outside traffic. This module configure `winRM` by setting up `winrm_protocol = "Https"` and `key_vault_certificate_secret_url` value to the Secret URL of a Key Vault Certificate.
 
 ## Network Security Groups
 
