@@ -147,7 +147,7 @@ module "virtual-machine" {
   source  = "kumarvna/virtual-machine/azurerm"
   version = "2.3.0"
 
-  # .... omitted
+# .... omitted for bravity
   
   os_flavor               = "linux"
   linux_distribution_name = "ubuntu2004"
@@ -162,7 +162,7 @@ module "virtual-machine" {
       version   = "latest"
     }
 
-  # .... omitted
+# .... omitted for bravity
 
 }
 ```
@@ -239,6 +239,47 @@ Azure managed disks are block-level storage volumes that are managed by Azure an
 
 By default, this module uses the standard SSD with Locally redundant storage (`StandardSSD_LRS`). To use other type of disks, set the argument `os_disk_storage_account_type` with valid values. Possible values are `Standard_LRS`, `StandardSSD_LRS` and `Premium_LRS`.
 
+### Identity - Configure managed identities for Azure resources on a VM
+
+Managed identities for Azure resources provides Azure services with an automatically managed identity in Azure Active Directory. You can use this identity to authenticate to any service that supports Azure AD authentication, without having credentials in your code.
+
+There are two types of managed identities:
+
+* **System-assigned**: When enabled a system-assigned managed identity an identity is created in Azure AD that is tied to the lifecycle of that service instance. So when the resource is deleted, Azure automatically deletes the identity for you. By design, only that Azure resource can use this identity to request tokens from Azure AD.
+* **User-assigned**: A managed identity as a standalone Azure resource. For User-assigned managed identities, the identity is managed separately from the resources that use it.
+
+Regardless of the type of identity chosen a managed identity is a service principal of a special type that may only be used with Azure resources. When the managed identity is deleted, the corresponding service principal is automatically removed.
+
+```terraform
+resource "azurerm_user_assigned_identity" "example" {
+  for_each            = toset(["user-identity1", "user-identity2"])
+  resource_group_name = "rg-shared-westeurope-01"
+  location            = "westeurope"
+  name                = each.key
+}
+
+module "virtual-machine" {
+  source  = "kumarvna/virtual-machine/azurerm"
+  version = "2.3.0"
+
+  # .... omitted for bravity
+  
+  os_flavor               = "linux"
+  linux_distribution_name = "ubuntu2004"
+  virtual_machine_size    = "Standard_B2s"
+  generate_admin_ssh_key  = true
+  instances_count         = 2
+
+  # Configure managed identities for Azure resources on a VM
+  # Possible types are `SystemAssigned`, `UserAssigned` and `SystemAssigned, UserAssigned`.
+  managed_identity_type = "UserAssigned"
+  managed_identity_ids  = [for k in azurerm_user_assigned_identity.example : k.id]
+
+# .... omitted for bravity
+
+}
+```
+
 ## Network Security Groups
 
 By default, the network security groups connected to Network Interface and allow necessary traffic and block everything else (deny-all rule). Use `nsg_inbound_rules` in this Terraform module to create a Network Security Group (NSG) for network interface and allow it to add additional rules for inbound flows.
@@ -252,7 +293,7 @@ module "virtual-machine" {
   source  = "kumarvna/virtual-machine/azurerm"
   version = "2.3.0"
 
-  # .... omitted
+# .... omitted for bravity
   
   os_flavor               = "linux"
   linux_distribution_name = "ubuntu2004"
@@ -274,12 +315,12 @@ module "virtual-machine" {
     },
   ]
 
-  # .... omitted
+# .... omitted for bravity
 
 }
 ```
 
-### Using exisging Network Security Groups
+## Using exisging Network Security Groups
 
 Enterprise environment may need a requirement to use pre existed NSG groups to maintain capabilites. This module supports existing network security groups usage. To use this feature, set the argument `existing_network_security_group_id` with a valid NSG resoruce id and remove all NSG inbound rules blocks from the module.
 
@@ -293,7 +334,7 @@ module "virtual-machine" {
   source  = "kumarvna/virtual-machine/azurerm"
   version = "2.3.0"
 
-  # .... omitted
+# .... omitted for bravity
   
   os_flavor               = "linux"
   linux_distribution_name = "ubuntu2004"
@@ -306,7 +347,7 @@ module "virtual-machine" {
   # Remove this NSG rules block, if `existing_network_security_group_id` is specified
   existing_network_security_group_id = data.azurerm_network_security_group.example.id
 
-  # .... omitted
+# .... omitted for bravity
 
 }
 ```
