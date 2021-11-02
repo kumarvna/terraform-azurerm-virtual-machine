@@ -216,6 +216,19 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
       identity_ids = var.managed_identity_type == "UserAssigned" || var.managed_identity_type == "SystemAssigned, UserAssigned" ? var.managed_identity_ids : null
     }
   }
+
+  dynamic "boot_diagnostics" {
+    for_each = var.enable_boot_diagnostics ? [1] : []
+    content {
+      storage_account_uri = var.storage_account_name != null ? data.azurerm_storage_account.storeacc.0.primary_blob_endpoint : var.storage_account_uri
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      tags,
+    ]
+  }
 }
 
 #---------------------------------------
@@ -291,6 +304,20 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
       content = var.additional_unattend_content
       setting = var.additional_unattend_content_setting
     }
+  }
+
+  dynamic "boot_diagnostics" {
+    for_each = var.enable_boot_diagnostics ? [1] : []
+    content {
+      storage_account_uri = var.storage_account_name != null ? data.azurerm_storage_account.storeacc.0.primary_blob_endpoint : var.storage_account_uri
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      tags,
+      patch_mode,
+    ]
   }
 }
 

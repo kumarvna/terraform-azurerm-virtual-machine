@@ -478,7 +478,7 @@ variable "managed_identity_ids" {
 }
 
 variable "winrm_protocol" {
-  description = "Specifies Specifies the protocol of listener. Possible values are `Http` or `Https`"
+  description = "Specifies the protocol of winrm listener. Possible values are `Http` or `Https`"
   default     = null
 }
 
@@ -494,6 +494,16 @@ variable "additional_unattend_content" {
 
 variable "additional_unattend_content_setting" {
   description = "The name of the setting to which the content applies. Possible values are `AutoLogon` and `FirstLogonCommands`"
+  default     = null
+}
+
+variable "enable_boot_diagnostics" {
+  description = "Should the boot diagnostics enabled?"
+  default     = false
+}
+
+variable "storage_account_uri" {
+  description = "The Primary/Secondary Endpoint for the Azure Storage Account which should be used to store Boot Diagnostics, including Console Output and Screenshots from the Hypervisor. Passing a `null` value will utilize a Managed Storage Account to store Boot Diagnostics."
   default     = null
 }
 
