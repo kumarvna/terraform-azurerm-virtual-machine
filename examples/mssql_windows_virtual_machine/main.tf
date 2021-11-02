@@ -54,7 +54,8 @@ module "virtual-machine" {
   enable_boot_diagnostics = true
 
   # Attach a managed data disk to a Windows/Linux VM's. Possible Storage account type are: 
-  # `Standard_LRS`, `StandardSSD_ZRS`, `Premium_LRS`, `Premium_ZRS`, `StandardSSD_LRS` or `UltraSSD_LRS`
+  # `Standard_LRS`, `StandardSSD_ZRS`, `Premium_LRS`, `Premium_ZRS`, `StandardSSD_LRS`
+  # or `UltraSSD_LRS` (UltraSSD_LRS only available in a region that support availability zones)
   # Initialize a new data disk - you need to connect to the VM and run diskmanagemnet or fdisk
   data_disks = [
     {
