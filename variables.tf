@@ -507,6 +507,16 @@ variable "storage_account_uri" {
   default     = null
 }
 
+variable "data_disks" {
+  description = "Data Disks for azure viratual machine"
+  type = list(object({
+    name                 = string
+    storage_account_type = string
+    disk_size_gb         = number
+  }))
+  default = []
+}
+
 variable "nsg_diag_logs" {
   description = "NSG Monitoring Category details for Azure Diagnostic setting"
   default     = ["NetworkSecurityGroupEvent", "NetworkSecurityGroupRuleCounter"]

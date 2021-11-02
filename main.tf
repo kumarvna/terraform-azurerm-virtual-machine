@@ -4,6 +4,12 @@ locals {
     security_rule : security_rule,
     }
   }
+
+  vm_data_disks = { for idx, data_disk in var.data_disks : data_disk.name => {
+    idx : idx,
+    data_disk : data_disk,
+    }
+  }
 }
 
 #---------------------------------------------------------------
@@ -72,6 +78,12 @@ resource "azurerm_public_ip" "pip" {
   domain_name_label   = var.domain_name_label
   availability_zone   = var.public_ip_availability_zone
   tags                = merge({ "ResourceName" = lower("pip-vm-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}-0${count.index + 1}") }, var.tags, )
+
+  lifecycle {
+    ignore_changes = [
+      tags,
+    ]
+  }
 }
 
 #---------------------------------------
@@ -96,6 +108,12 @@ resource "azurerm_network_interface" "nic" {
     private_ip_address            = var.private_ip_address_allocation_type == "Static" ? element(concat(var.private_ip_address, [""]), count.index) : null
     public_ip_address_id          = var.enable_public_ip_address == true ? element(concat(azurerm_public_ip.pip.*.id, [""]), count.index) : null
   }
+
+  lifecycle {
+    ignore_changes = [
+      tags,
+    ]
+  }
 }
 
 #----------------------------------------------------------------------------------------------------
@@ -107,6 +125,12 @@ resource "azurerm_proximity_placement_group" "appgrp" {
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
   tags                = merge({ "ResourceName" = lower("proxigrp-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}") }, var.tags, )
+
+  lifecycle {
+    ignore_changes = [
+      tags,
+    ]
+  }
 }
 
 #-----------------------------------------------------
@@ -122,6 +146,12 @@ resource "azurerm_availability_set" "aset" {
   proximity_placement_group_id = var.enable_proximity_placement_group ? azurerm_proximity_placement_group.appgrp.0.id : null
   managed                      = true
   tags                         = merge({ "ResourceName" = lower("avail-${var.virtual_machine_name}-${data.azurerm_resource_group.rg.location}") }, var.tags, )
+
+  lifecycle {
+    ignore_changes = [
+      tags,
+    ]
+  }
 }
 
 #---------------------------------------------------------------
@@ -133,6 +163,12 @@ resource "azurerm_network_security_group" "nsg" {
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
   tags                = merge({ "ResourceName" = lower("nsg_${var.virtual_machine_name}_${data.azurerm_resource_group.rg.location}_in") }, var.tags, )
+
+  lifecycle {
+    ignore_changes = [
+      tags,
+    ]
+  }
 }
 
 resource "azurerm_network_security_rule" "nsg_rule" {
@@ -203,6 +239,7 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
     disk_encryption_set_id    = var.disk_encryption_set_id
     disk_size_gb              = var.disk_size_gb
     write_accelerator_enabled = var.enable_os_disk_write_accelerator
+    name                      = var.os_disk_name
   }
 
   additional_capabilities {
@@ -321,6 +358,35 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
   }
 }
 
+#---------------------------------------
+# Virtual machine data disks
+#---------------------------------------
+resource "azurerm_managed_disk" "data_disk" {
+  for_each             = local.vm_data_disks
+  name                 = "${var.virtual_machine_name}_DataDisk_${each.value.idx}"
+  resource_group_name  = data.azurerm_resource_group.rg.name
+  location             = data.azurerm_resource_group.rg.location
+  storage_account_type = lookup(each.value.data_disk, "storage_account_type", "StandardSSD_LRS")
+  create_option        = "Empty"
+  disk_size_gb         = each.value.data_disk.disk_size_gb
+  tags                 = merge({ "ResourceName" = "${var.virtual_machine_name}_DataDisk_${each.value.idx}" }, var.tags, )
+
+  lifecycle {
+    ignore_changes = [
+      tags,
+    ]
+  }
+}
+
+resource "azurerm_virtual_machine_data_disk_attachment" "data_disk" {
+  for_each           = local.vm_data_disks
+  managed_disk_id    = azurerm_managed_disk.data_disk[each.key].id
+  virtual_machine_id = var.os_flavor == "windows" ? azurerm_windows_virtual_machine.win_vm[0].id : azurerm_linux_virtual_machine.linux_vm[0].id
+  lun                = each.value.idx
+  caching            = "ReadWrite"
+}
+
+
 #--------------------------------------------------------------
 # Azure Log Analytics Workspace Agent Installation for windows
 #--------------------------------------------------------------
@@ -378,7 +444,7 @@ resource "azurerm_virtual_machine_extension" "omsagentlinux" {
 resource "azurerm_monitor_diagnostic_setting" "nsg" {
   count                      = var.existing_network_security_group_id == null && var.log_analytics_workspace_name != null ? 1 : 0
   name                       = lower("nsg-${var.virtual_machine_name}-diag")
-  target_resource_id         = azurerm_network_security_group.nsg.*.id
+  target_resource_id         = azurerm_network_security_group.nsg.0.id
   storage_account_id         = var.storage_account_name != null ? data.azurerm_storage_account.storeacc.0.id : null
   log_analytics_workspace_id = data.azurerm_log_analytics_workspace.logws.0.id
 
