@@ -4,7 +4,7 @@ This terraform module is designed to deploy azure MSSQL Windows virtual machines
 
 This module supports to use existing NSG group. To enable this feature, specify the argument `existing_network_security_group_id` with a valid resource id of the current NSG group and remove all NSG inbound rules from the module.
 
-## Module Usage to create Windows MS-SQL VM with optional resources
+## Module Usage to create MS-SQL Windows VM with optional resources
 
 ```terraform
 # Azurerm provider configuration
