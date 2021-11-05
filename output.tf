@@ -12,13 +12,13 @@ output "admin_ssh_key_private" {
 output "windows_vm_password" {
   description = "Password for the windows VM"
   sensitive   = true
-  value       = var.os_flavor == "windows" ? element(concat(random_password.passwd.*.result, [""]), 0) : null
+  value       = var.admin_password == null ? element(concat(random_password.passwd.*.result, [""]), 0) : var.admin_password
 }
 
 output "linux_vm_password" {
   description = "Password for the Linux VM"
   sensitive   = true
-  value       = var.os_flavor == "linux" && var.disable_password_authentication != true && var.admin_password == null ? element(concat(random_password.passwd.*.result, [""]), 0) : null
+  value       = var.disable_password_authentication == false && var.admin_password == null ? element(concat(random_password.passwd.*.result, [""]), 0) : var.admin_password
 }
 
 output "windows_vm_public_ips" {
@@ -53,7 +53,7 @@ output "windows_virtual_machine_ids" {
 
 output "network_security_group_ids" {
   description = "List of Network security groups and ids"
-  value       = azurerm_network_security_group.nsg.*.id
+  value       = var.existing_network_security_group_id == null ? azurerm_network_security_group.nsg.*.id : null
 }
 
 output "vm_availability_set_id" {

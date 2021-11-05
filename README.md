@@ -414,7 +414,7 @@ Name | Description | Type | Default
 `dns_servers`|List of dns servers to use for network interface|string|`[]`
 `enable_ip_forwarding`|Should IP Forwarding be enabled?|string|`false`
 `enable_accelerated_networking`|Should Accelerated Networking be enabled?|string|`false`
-`private_ip_address_allocation_type`|The allocation method used for the Private IP Address. Possible values are Dynamic and Static.|string|`false`
+`private_ip_address_allocation_type`|The allocation method used for the Private IP Address. Possible values are Dynamic and Static.|string|`Dynamic`
 `private_ip_address`|The Static IP Address which should be used. This is valid only when `private_ip_address_allocation` is set to `Static`.|string|`null`
 `enable_vm_availability_set`|Manages an Availability Set for Virtual Machines.|string|`false`
 `platform_fault_domain_count`|Specifies the number of fault domains that are used|number|`3`
@@ -433,7 +433,7 @@ Name | Description | Type | Default
 `dedicated_host_id`|The ID of a Dedicated Host where this machine should be run on|string|`null`
 `custom_data`|Base64 encoded file of a bash script that gets run once by cloud-init upon VM creation|string|`null`
 `enable_automatic_updates`|Specifies if Automatic Updates are Enabled for the Windows Virtual Machine|string|`false`
-`enable_encryption_at_host`|Should all of the disks (including the temp disk) attached to this Virtual Machine be encrypted by enabling Encryption at Host?|string|false
+`enable_encryption_at_host`|Should all of the disks (including the temp disk) attached to this Virtual Machine be encrypted by enabling Encryption at Host?|string|`false`
 `vm_availability_zone`|The Zone in which this Virtual Machine should be created. Conflicts with availability set and shouldn't use both.|string|`null`
 `patch_mode`|Specifies the mode of in-guest patching to this Windows Virtual Machine. Possible values are `Manual`, `AutomaticByOS` and `AutomaticByPlatform`|string|`"AutomaticByOS"`
 `license_type`|Specifies the type of on-premise license which should be used for this Virtual Machine. Possible values are `None`, `Windows_Client` and `Windows_Server`.|string|`"None"`
@@ -458,12 +458,15 @@ Name | Description | Type | Default
 `key_vault_certificate_secret_url`|The Secret URL of a Key Vault Certificate, which must be specified when `protocol` is set to `Https`|string|`null`
 `additional_unattend_content`|The XML formatted content that is added to the unattend.xml file for the specified path and component|string|`null`
 `additional_unattend_content_setting`|The name of the setting to which the content applies. Possible values are `AutoLogon` and `FirstLogonCommands`|string|`null`
-`enable_boot_diagnostics`|Should the boot diagnostics enabled?|string|false
+`enable_boot_diagnostics`|Should the boot diagnostics enabled?|string|`false`
 `storage_account_uri`|The Primary/Secondary Endpoint for the Azure Storage Account which should be used to store Boot Diagnostics, including Console Output and Screenshots from the Hypervisor. Passing a `null` value will utilize a Managed Storage Account to store Boot Diagnostics|string|`null`
 `data_disks`|Managed Data Disks for azure viratual machine|list|`[]`
-`log_analytics_workspace_name`|The name of log analytics workspace name|string|`null`
 `storage_account_name`|The name of the storage account name|string|`null`
 `deploy_log_analytics_agent`|Install log analytics agent to windows or linux VM|string|`false`
+`log_analytics_workspace_id`|The name of log analytics workspace resource id|string|`null`
+`log_analytics_customer_id`|The Workspace (or Customer) ID for the Log Analytics Workspace|string|`null`
+`log_analytics_workspace_primary_shared_key`|The Primary shared key for the Log Analytics Workspace|string|`null`
+`intall_iis_server_on_instances`|Install ISS server on every Instance in the VM scale set|string|`false`
 `Tags`|A map of tags to add to all resources|map|`{}`
 
 ## Outputs
