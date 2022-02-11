@@ -205,6 +205,7 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
   network_interface_ids      = [azurerm_network_interface.nic.id]
   source_image_id            = var.source_image_id != null ? var.source_image_id : null
   provision_vm_agent         = true
+  patch_mode                 = var.patch_mode != null ? var.patch_mode : null
   allow_extension_operations = true
   custom_data                = var.custom_data != null ? var.custom_data : null
   dedicated_host_id          = var.dedicated_host_id
@@ -235,6 +236,22 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
     name                 = "${var.virtual_machine_name}_OsDisk"
     caching              = "ReadWrite"
   }
+
+  dynamic "identity" {
+    for_each = var.identity_type == "SystemAssigned" ? [1] : []
+    content {
+      type = "SystemAssigned"
+    }
+  }
+
+  dynamic "identity" {
+    for_each = var.identity_type == "UserAssigned" ? [1] : []
+    content {
+      type         = "UserAssigned"
+      identity_ids = [var.identity_ids]
+    }
+  }
+
 }
 
 #---------------------------------------
@@ -252,6 +269,7 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
   network_interface_ids      = [azurerm_network_interface.nic.id]
   source_image_id            = var.source_image_id != null ? var.source_image_id : null
   provision_vm_agent         = true
+  patch_mode                 = var.patch_mode != null ? var.patch_mode : null
   allow_extension_operations = true
   dedicated_host_id          = var.dedicated_host_id
   license_type               = var.license_type
@@ -277,6 +295,21 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
     storage_account_type = var.os_disk_storage_account_type
     name                 = "${var.virtual_machine_name}_OsDisk"
     caching              = "ReadWrite"
+  }
+
+  dynamic "identity" {
+    for_each = var.identity_type == "SystemAssigned" ? [1] : []
+    content {
+      type = "SystemAssigned"
+    }
+  }
+
+  dynamic "identity" {
+    for_each = var.identity_type == "UserAssigned" ? [1] : []
+    content {
+      type         = "UserAssigned"
+      identity_ids = [var.identity_ids]
+    }
   }
 }
 

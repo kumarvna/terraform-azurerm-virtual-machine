@@ -45,6 +45,11 @@ variable "virtual_machine_size" {
   default     = "Standard_B2s"
 }
 
+variable "patch_mode" {
+  description = "Specifies the mode of in-guest patching to this Windows Virtual Machine. Possible values are AutomaticByPlatform and ImageDefault for Linux VMs and Manual, AutomaticByOS and AutomaticByPlatform for Windows VMs"
+  default     = null
+}
+
 variable "enable_ip_forwarding" {
   description = "Should IP Forwarding be enabled? Defaults to false"
   default     = false
@@ -140,6 +145,13 @@ variable "linux_distribution_list" {
       publisher = "Canonical"
       offer     = "0001-com-ubuntu-server-focal"
       sku       = "20_04-lts-gen2"
+      version   = "latest"
+    },
+
+    ubuntu2004_1 = {
+      publisher = "Canonical"
+      offer     = "0001-com-ubuntu-server-focal"
+      sku       = "20_04-lts"
       version   = "latest"
     },
 
@@ -358,6 +370,16 @@ variable "admin_ssh_key" {
 variable "disable_password_authentication" {
   description = "Should Password Authentication be disabled on this Virtual Machine? Defaults to true."
   default     = true
+}
+
+variable "identity_type" {
+  description = "Virtual machine identity type. Can be SystemAssigned or UserAssigned"
+  default     = ""
+}
+
+variable "identity_ids" {
+  description = "identity ids for virtual machine user assigned identities"
+  default     = []
 }
 
 variable "ad_domain_name" {
