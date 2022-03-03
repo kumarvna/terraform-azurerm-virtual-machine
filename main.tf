@@ -233,7 +233,7 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
 
   os_disk {
     storage_account_type = var.os_disk_storage_account_type
-    name                 = "${var.virtual_machine_name}_OsDisk"
+    name                 = coalesce(var.custom_osdisk_name, "${var.virtual_machine_name}_OsDisk")
     caching              = "ReadWrite"
   }
 
