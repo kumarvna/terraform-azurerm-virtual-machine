@@ -12,6 +12,10 @@ resource "azurerm_virtual_machine_extension" "guestsagentwin" {
   type                       = "ConfigurationforWindows"
   type_handler_version       = "1.29"
   auto_upgrade_minor_version = true
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 #--------------------------------------------------------------
@@ -26,6 +30,10 @@ resource "azurerm_virtual_machine_extension" "guestsagentlinux" {
   type                       = "ConfigurationforWindows"
   type_handler_version       = "1.26"
   auto_upgrade_minor_version = true
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 #--------------------------------------------------------------
@@ -115,11 +123,11 @@ resource "azurerm_virtual_machine_extension" "domjoin" {
   }
   PROTECTED_SETTINGS
 
-  depends_on = [azurerm_windows_virtual_machine.win_vm]
-
   lifecycle {
     ignore_changes = [tags]
   }
+
+  depends_on = [azurerm_windows_virtual_machine.win_vm]
 }
 
 #---------------------------------------
@@ -169,9 +177,9 @@ resource "azurerm_virtual_machine_extension" "AzureDSC" {
   }
   PROTECTED_SETTINGS
 
-  depends_on = [azurerm_windows_virtual_machine.win_vm, azurerm_virtual_machine_extension.domjoin]
-
   lifecycle {
     ignore_changes = [tags]
   }
+
+  depends_on = [azurerm_windows_virtual_machine.win_vm, azurerm_virtual_machine_extension.domjoin]
 }

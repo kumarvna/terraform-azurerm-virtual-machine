@@ -214,10 +214,6 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
   availability_set_id        = var.enable_vm_availability_set == true ? azurerm_availability_set.aset[0].id : null
   tags                       = merge({ "ResourceName" = var.virtual_machine_name }, var.tags, )
 
-  lifecycle {
-    ignore_changes = [tags]
-  }
-
   admin_ssh_key {
     username   = var.admin_username
     public_key = var.admin_ssh_key == true && var.os_flavor == "linux" ? tls_private_key.rsa[0].public_key_openssh : var.admin_ssh_key
@@ -239,6 +235,8 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
     caching              = "ReadWrite"
   }
 
+  boot_diagnostics {}
+
   dynamic "identity" {
     for_each = var.identity_type == "SystemAssigned" ? [1] : []
     content {
@@ -252,6 +250,10 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
       type         = "UserAssigned"
       identity_ids = [var.identity_ids]
     }
+  }
+
+  lifecycle {
+    ignore_changes = [tags]
   }
 
 }
@@ -279,10 +281,6 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
   timezone                   = var.vm_time_zone
   tags                       = merge({ "ResourceName" = var.virtual_machine_name }, var.tags, )
 
-  lifecycle {
-    ignore_changes = [tags]
-  }
-
   dynamic "source_image_reference" {
     for_each = var.source_image_id != null ? [] : [1]
     content {
@@ -299,6 +297,8 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
     caching              = "ReadWrite"
   }
 
+  boot_diagnostics {}
+
   dynamic "identity" {
     for_each = var.identity_type == "SystemAssigned" ? [1] : []
     content {
@@ -313,6 +313,11 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
       identity_ids = [var.identity_ids]
     }
   }
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
+
 }
 
 #---------------------------------------
