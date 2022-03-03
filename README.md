@@ -313,6 +313,8 @@ No modules.
 | [azurerm_virtual_machine_data_disk_attachment.data_disk](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_data_disk_attachment) | resource |
 | [azurerm_virtual_machine_extension.AzureDSC](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_extension) | resource |
 | [azurerm_virtual_machine_extension.domjoin](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_extension) | resource |
+| [azurerm_virtual_machine_extension.guestsagentlinux](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_extension) | resource |
+| [azurerm_virtual_machine_extension.guestsagentwin](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_extension) | resource |
 | [azurerm_virtual_machine_extension.omsagentlinux](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_extension) | resource |
 | [azurerm_virtual_machine_extension.omsagentwin](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_extension) | resource |
 | [azurerm_windows_virtual_machine.win_vm](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/windows_virtual_machine) | resource |
@@ -336,6 +338,7 @@ No modules.
 | <a name="input_backup_enabled"></a> [backup\_enabled](#input\_backup\_enabled) | n/a | `bool` | n/a | yes |
 | <a name="input_backup_settings"></a> [backup\_settings](#input\_backup\_settings) | Provide the recovery vault and backup policy details for VM backup | `map(string)` | `{}` | no |
 | <a name="input_custom_data"></a> [custom\_data](#input\_custom\_data) | Base64 encoded file of a bash script that gets run once by cloud-init upon VM creation | `any` | `null` | no |
+| <a name="input_custom_datadisk_name"></a> [custom\_datadisk\_name](#input\_custom\_datadisk\_name) | Legacy Data disk name pre-module-version 5 | `string` | `""` | no |
 | <a name="input_custom_image"></a> [custom\_image](#input\_custom\_image) | Provide the custom image to this module if the default variants are not sufficient | <pre>object({<br>    publisher = string<br>    offer     = string<br>    sku       = string<br>    version   = string<br>  })</pre> | `null` | no |
 | <a name="input_custom_osdisk_name"></a> [custom\_osdisk\_name](#input\_custom\_osdisk\_name) | Legacy OS Diskname pre-module-version 5 | `string` | `""` | no |
 | <a name="input_data_disks"></a> [data\_disks](#input\_data\_disks) | Provide the data disk parameters | `list` | `[]` | no |

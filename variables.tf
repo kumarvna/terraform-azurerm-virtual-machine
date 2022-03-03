@@ -362,6 +362,11 @@ variable "data_disks" {
   default     = []
 }
 
+variable "custom_datadisk_name" {
+  description = "Legacy Data disk name pre-module-version 5"
+  default     = ""
+}
+
 variable "generate_admin_ssh_key" {
   description = "Generates a secure private key and encodes it as PEM."
   default     = false

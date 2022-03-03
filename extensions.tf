@@ -1,8 +1,39 @@
+#For a list of available VM extensions run "az vm extension image list --location westeurope --output table"
+
+#--------------------------------------------------------------
+# Guest Configuration Agent Installation for windows
+#--------------------------------------------------------------
+resource "azurerm_virtual_machine_extension" "guestsagentwin" {
+  count = var.os_flavor == "windows" ? 1 : 0
+
+  name                       = "GuestConfigurationAgentForWindows"
+  virtual_machine_id         = azurerm_windows_virtual_machine.win_vm[count.index].id
+  publisher                  = "Microsoft.GuestConfiguration"
+  type                       = "ConfigurationforWindows"
+  type_handler_version       = "1.29"
+  auto_upgrade_minor_version = true
+}
+
+#--------------------------------------------------------------
+# Guest Configuration Agent Installation for Linux
+#--------------------------------------------------------------
+resource "azurerm_virtual_machine_extension" "guestsagentlinux" {
+  count = var.os_flavor == "linux" ? 1 : 0
+
+  name                       = "GuestConfigurationAgentForLinux"
+  virtual_machine_id         = azurerm_linux_virtual_machine.linux_vm[count.index].id
+  publisher                  = "Microsoft.GuestConfiguration"
+  type                       = "ConfigurationforWindows"
+  type_handler_version       = "1.26"
+  auto_upgrade_minor_version = true
+}
+
 #--------------------------------------------------------------
 # Azure Log Analytics Workspace Agent Installation for windows
 #--------------------------------------------------------------
 resource "azurerm_virtual_machine_extension" "omsagentwin" {
-  count                      = var.log_analytics_workspace_name != null && var.os_flavor == "windows" ? 1 : 0
+  count = var.log_analytics_workspace_name != null && var.os_flavor == "windows" ? 1 : 0
+
   name                       = "OmsAgentForWindows"
   virtual_machine_id         = azurerm_windows_virtual_machine.win_vm[count.index].id
   publisher                  = "Microsoft.EnterpriseCloud.Monitoring"
@@ -31,7 +62,8 @@ resource "azurerm_virtual_machine_extension" "omsagentwin" {
 # Azure Log Analytics Workspace Agent Installation for Linux
 #--------------------------------------------------------------
 resource "azurerm_virtual_machine_extension" "omsagentlinux" {
-  count                      = var.log_analytics_workspace_name != null && var.os_flavor == "linux" ? 1 : 0
+  count = var.log_analytics_workspace_name != null && var.os_flavor == "linux" ? 1 : 0
+
   name                       = "OmsAgentForLinux"
   virtual_machine_id         = azurerm_linux_virtual_machine.linux_vm[count.index].id
   publisher                  = "Microsoft.EnterpriseCloud.Monitoring"
@@ -60,7 +92,8 @@ resource "azurerm_virtual_machine_extension" "omsagentlinux" {
 # Domain Join for Windows Virtual Machine
 #---------------------------------------
 resource "azurerm_virtual_machine_extension" "domjoin" {
-  count                = var.ad_domain_name != null && var.os_flavor == "windows" ? 1 : 0
+  count = var.ad_domain_name != null && var.os_flavor == "windows" ? 1 : 0
+
   name                 = "DomainJoin"
   virtual_machine_id   = azurerm_windows_virtual_machine.win_vm[count.index].id
   publisher            = "Microsoft.Compute"
@@ -93,7 +126,8 @@ resource "azurerm_virtual_machine_extension" "domjoin" {
 # Azure DSC onboarding and Baseline configuration for Windows Virtual Machine
 #---------------------------------------
 resource "azurerm_virtual_machine_extension" "AzureDSC" {
-  count                      = var.ad_domain_name != null && var.os_flavor == "windows" ? 1 : 0
+  count = var.ad_domain_name != null && var.os_flavor == "windows" ? 1 : 0
+
   name                       = "AzureDSC"
   virtual_machine_id         = azurerm_windows_virtual_machine.win_vm[count.index].id
   publisher                  = "Microsoft.Powershell"

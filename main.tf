@@ -10,6 +10,8 @@ locals {
     data_disk : data_disk,
     }
   }
+
+  data_disk_name = coalesce(var.custom_datadisk_name, "${var.virtual_machine_name}_DataDisk")
 }
 
 #---------------------------------------------------------------
@@ -170,7 +172,7 @@ resource "azurerm_monitor_diagnostic_setting" "nsg" {
 #---------------------------------------
 resource "azurerm_managed_disk" "data_disk" {
   for_each             = local.vm_data_disks
-  name                 = "${var.virtual_machine_name}_DataDisk_${each.value.idx}"
+  name                 = "${local.data_disk_name}_${each.value.idx}"
   location             = var.location
   resource_group_name  = var.resource_group_name
   storage_account_type = each.value.data_disk.storage_account_type
@@ -293,7 +295,7 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
 
   os_disk {
     storage_account_type = var.os_disk_storage_account_type
-    name                 = "${var.virtual_machine_name}_OsDisk"
+    name                 = coalesce(var.custom_osdisk_name, "${var.virtual_machine_name}_OsDisk")
     caching              = "ReadWrite"
   }
 
