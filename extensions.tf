@@ -27,7 +27,7 @@ resource "azurerm_virtual_machine_extension" "guestsagentlinux" {
   name                       = "GuestConfigurationAgentForLinux"
   virtual_machine_id         = azurerm_linux_virtual_machine.linux_vm[count.index].id
   publisher                  = "Microsoft.GuestConfiguration"
-  type                       = "ConfigurationforWindows"
+  type                       = "ConfigurationforLinux"
   type_handler_version       = "1.26"
   auto_upgrade_minor_version = true
 
