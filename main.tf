@@ -10,6 +10,8 @@ locals {
     data_disk : data_disk,
     }
   }
+
+  data_disk_name = coalesce(var.custom_datadisk_name, "${var.virtual_machine_name}_DataDisk")
 }
 
 #---------------------------------------------------------------
@@ -170,7 +172,7 @@ resource "azurerm_monitor_diagnostic_setting" "nsg" {
 #---------------------------------------
 resource "azurerm_managed_disk" "data_disk" {
   for_each             = local.vm_data_disks
-  name                 = "${var.virtual_machine_name}_DataDisk_${each.value.idx}"
+  name                 = "${local.data_disk_name}_${each.value.idx}"
   location             = var.location
   resource_group_name  = var.resource_group_name
   storage_account_type = each.value.data_disk.storage_account_type
@@ -212,10 +214,6 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
   availability_set_id        = var.enable_vm_availability_set == true ? azurerm_availability_set.aset[0].id : null
   tags                       = merge({ "ResourceName" = var.virtual_machine_name }, var.tags, )
 
-  lifecycle {
-    ignore_changes = [tags]
-  }
-
   admin_ssh_key {
     username   = var.admin_username
     public_key = var.admin_ssh_key == true && var.os_flavor == "linux" ? tls_private_key.rsa[0].public_key_openssh : var.admin_ssh_key
@@ -233,9 +231,11 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
 
   os_disk {
     storage_account_type = var.os_disk_storage_account_type
-    name                 = "${var.virtual_machine_name}_OsDisk"
+    name                 = coalesce(var.custom_osdisk_name, "${var.virtual_machine_name}_OsDisk")
     caching              = "ReadWrite"
   }
+
+  boot_diagnostics {}
 
   dynamic "identity" {
     for_each = var.identity_type == "SystemAssigned" ? [1] : []
@@ -250,6 +250,10 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
       type         = "UserAssigned"
       identity_ids = [var.identity_ids]
     }
+  }
+
+  lifecycle {
+    ignore_changes = [tags]
   }
 
 }
@@ -277,10 +281,6 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
   timezone                   = var.vm_time_zone
   tags                       = merge({ "ResourceName" = var.virtual_machine_name }, var.tags, )
 
-  lifecycle {
-    ignore_changes = [tags]
-  }
-
   dynamic "source_image_reference" {
     for_each = var.source_image_id != null ? [] : [1]
     content {
@@ -293,9 +293,11 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
 
   os_disk {
     storage_account_type = var.os_disk_storage_account_type
-    name                 = "${var.virtual_machine_name}_OsDisk"
+    name                 = coalesce(var.custom_osdisk_name, "${var.virtual_machine_name}_OsDisk")
     caching              = "ReadWrite"
   }
+
+  boot_diagnostics {}
 
   dynamic "identity" {
     for_each = var.identity_type == "SystemAssigned" ? [1] : []
@@ -311,6 +313,11 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
       identity_ids = [var.identity_ids]
     }
   }
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
+
 }
 
 #---------------------------------------

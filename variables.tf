@@ -352,9 +352,19 @@ variable "os_disk_storage_account_type" {
   default     = "StandardSSD_LRS"
 }
 
+variable "custom_osdisk_name" {
+  description = "Legacy OS Diskname pre-module-version 5"
+  default     = ""
+}
+
 variable "data_disks" {
   description = "Provide the data disk parameters"
   default     = []
+}
+
+variable "custom_datadisk_name" {
+  description = "Legacy Data disk name pre-module-version 5"
+  default     = ""
 }
 
 variable "generate_admin_ssh_key" {
