@@ -75,9 +75,14 @@ variable "dns_servers" {
   default     = []
 }
 
-variable "enable_vm_availability_set" {
-  description = "Manages an Availability Set for Virtual Machines."
-  default     = false
+variable "availability_set_id" {
+  description = "Availability Set ID of availability set to add the Virtual Machine to."
+  default     = null
+}
+
+variable "availability_zone" {
+  description = "Index of availability zone in which the Virtual Machine should be deployed to."
+  default     = null
 }
 
 variable "enable_public_ip_address" {
@@ -242,19 +247,33 @@ variable "windows_distribution_list" {
   }))
 
   default = {
-    windows2012r2dc = {
+    windows2022dc = {
       publisher = "MicrosoftWindowsServer"
       offer     = "WindowsServer"
-      sku       = "2012-R2-Datacenter"
+      sku       = "2022-datacenter"
       version   = "latest"
     },
 
-    windows2016dc = {
+    windows2022dccore = {
       publisher = "MicrosoftWindowsServer"
       offer     = "WindowsServer"
-      sku       = "2016-Datacenter"
+      sku       = "2022-datacenter-core"
       version   = "latest"
     },
+
+    windows2022dcazure = {
+      publisher = "MicrosoftWindowsServer"
+      offer     = "WindowsServer"
+      sku       = "2022-datacenter-azure-edition"
+      version   = "latest"
+    },
+
+    windows2022dccoreazure = {
+      publisher = "MicrosoftWindowsServer"
+      offer     = "WindowsServer"
+      sku       = "2022-datacenter-azure-edition-core"
+      version   = "latest"
+    }
 
     windows2019dc = {
       publisher = "MicrosoftWindowsServer"
@@ -270,10 +289,10 @@ variable "windows_distribution_list" {
       version   = "latest"
     },
 
-    windows2016dccore = {
+    windows2019dccore = {
       publisher = "MicrosoftWindowsServer"
       offer     = "WindowsServer"
-      sku       = "2016-Datacenter-Server-Core"
+      sku       = "2019-Datacenter-Core"
       version   = "latest"
     },
 
@@ -344,7 +363,7 @@ variable "windows_distribution_list" {
 
 variable "windows_distribution_name" {
   default     = "windows2019dcgen2"
-  description = "Variable to pick an OS flavour for Windows based VM. Possible values include: winserver, wincore, winsql"
+  description = "Variable to pick an OS flavour for Windows based VM."
 }
 
 variable "os_disk_storage_account_type" {

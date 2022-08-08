@@ -90,24 +90,6 @@ resource "azurerm_network_interface" "nic" {
   }
 }
 
-#---------------------------------------
-# Virtual Machine Availability Set
-#---------------------------------------
-resource "azurerm_availability_set" "aset" {
-  count                        = var.enable_vm_availability_set ? 1 : 0
-  name                         = lower("avail-${var.virtual_machine_name}-${var.location}")
-  resource_group_name          = var.resource_group_name
-  location                     = var.location
-  platform_fault_domain_count  = 2
-  platform_update_domain_count = 2
-  managed                      = true
-  tags                         = merge({ "ResourceName" = lower("avail-${var.virtual_machine_name}-${var.location}") }, var.tags, )
-
-  lifecycle {
-    ignore_changes = [tags]
-  }
-}
-
 #---------------------------------------------------------------
 # Network security group for Virtual Machine Network Interface
 #---------------------------------------------------------------
@@ -211,7 +193,8 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
   allow_extension_operations = true
   custom_data                = var.custom_data != null ? var.custom_data : null
   dedicated_host_id          = var.dedicated_host_id
-  availability_set_id        = var.enable_vm_availability_set == true ? azurerm_availability_set.aset[0].id : null
+  availability_set_id        = var.availability_set_id != null ? var.availability_set_id : null
+  zone                       = var.availability_zone != null ? var.availability_zone : null
   tags                       = merge({ "ResourceName" = var.virtual_machine_name }, var.tags, )
 
   admin_ssh_key {
@@ -277,7 +260,8 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
   allow_extension_operations = true
   dedicated_host_id          = var.dedicated_host_id
   license_type               = var.license_type
-  availability_set_id        = var.enable_vm_availability_set == true ? azurerm_availability_set.aset[0].id : null
+  availability_set_id        = var.availability_set_id != null ? var.availability_set_id : null
+  zone                       = var.availability_zone != null ? var.availability_zone : null
   timezone                   = var.vm_time_zone
   tags                       = merge({ "ResourceName" = var.virtual_machine_name }, var.tags, )
 
