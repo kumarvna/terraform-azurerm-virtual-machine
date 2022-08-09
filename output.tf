@@ -55,7 +55,7 @@ output "identity" {
   value       = var.os_flavor == "windows" ? azurerm_windows_virtual_machine.win_vm.0.identity : azurerm_linux_virtual_machine.linux_vm.0.identity
 }
 
-output "vm_availability_set_id" {
-  description = "The resource ID of Virtual Machine availability set"
-  value       = var.enable_vm_availability_set == true ? element(concat(azurerm_availability_set.aset.*.id, [""]), 0) : null
+output "availability_zone" {
+  description = "Virtual machine availability zone"
+  value       = var.os_flavor == "windows" ? azurerm_windows_virtual_machine.win_vm.0.zone : azurerm_linux_virtual_machine.linux_vm.0.zone
 }
