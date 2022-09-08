@@ -257,6 +257,7 @@ resource "azurerm_windows_virtual_machine" "win_vm" {
   source_image_id            = var.source_image_id != null ? var.source_image_id : null
   provision_vm_agent         = true
   patch_mode                 = var.patch_mode != null ? var.patch_mode : null
+  enable_automatic_updates   = var.patch_mode == "Manual" ? false : true
   allow_extension_operations = true
   dedicated_host_id          = var.dedicated_host_id
   license_type               = var.license_type
